@@ -7,7 +7,7 @@ services:
     env_file:
       - "env/pgsql.env"
     volumes:
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      - ./init/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
       - postgres:/data/postgres
     ports:
       - "5432:5432"

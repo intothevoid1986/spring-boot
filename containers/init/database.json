@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "ocloud_cost": {
+      "Name": "Minimally Defined Server",
+      "Group": "Local Docker Container",
+      "Port": 5432,
+      "Username": "docker",
+      "Host": "postgres",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "ocloud_cost"
+    }
+  }
+}
