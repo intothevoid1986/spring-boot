@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "users")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
 	@Id
@@ -19,7 +21,10 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_sequence")
 	private Long id;
 
-	@Column(name = "name")
+	@Column(name = "firstname")
 	private String firstName;
+
+	@Column(name = "lastname")
+	private String lastName;
 
 }
