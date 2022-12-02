@@ -1,4 +1,13 @@
 spring:
+  opestack:
+    auth:
+      endpoint: https://api.it-mil1.entercloudsuite.com/v3
+      project_Id: 9430056e47ae41b4a09e63bf7c2dd444
+      username: marco.colaiuda@irideos.it
+      password: Hondafour750!!
+      tenantName: marco.colaiuda@irideos.it
+      domainName: Default
+      region: it-mil1
   batch:
     jdbc:
       initialize-schema: ALWAYS

@@ -8,13 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity(name = "users")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends BaseModel {
 
 	@Id
 	@SequenceGenerator(name = "users_sequence", sequenceName = "users_sequence", allocationSize = 1)
