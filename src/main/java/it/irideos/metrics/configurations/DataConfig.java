@@ -19,6 +19,15 @@ public class DataConfig {
     public String tenantName;
     public String region;
     public String domainName;
+    public String projectId;
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
 
     public String getDomainName() {
         return domainName;
@@ -77,6 +86,7 @@ public class DataConfig {
                 ", tenantName='" + getTenantName() + "'" +
                 ", region='" + getRegion() + "'" +
                 ", domainName='" + getDomainName() + "'" +
+                ", projectId='" + getProjectId() + "'" +
                 "}";
     }
 
