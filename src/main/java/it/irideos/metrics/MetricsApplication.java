@@ -10,7 +10,7 @@ import it.irideos.metrics.configurations.OcloudAuth;
 public class MetricsApplication {
 
 	@Autowired
-	public OcloudAuth auth;
+	public static OcloudAuth auth;
 
 	public static void main(String[] args) {
 		SpringApplication.run(MetricsApplication.class, args);

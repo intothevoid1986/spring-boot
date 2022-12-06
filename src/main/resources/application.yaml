@@ -8,6 +8,8 @@ spring:
       tenantName: marco.colaiuda@irideos.it
       domainName: Default
       region: it-mil1
+  gnocchi:
+    endpoint: https://gnocchi.it-mil1.entercloudsuite.com/v1
   batch:
     jdbc:
       initialize-schema: ALWAYS
