@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class VmResource extends BaseModel {
+public class VmResourceModel extends BaseModel {
 
     @Id
     @SequenceGenerator(name = "vm_sequence", sequenceName = "vm_sequence", allocationSize = 1)

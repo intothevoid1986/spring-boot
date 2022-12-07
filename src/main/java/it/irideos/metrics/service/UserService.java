@@ -3,7 +3,7 @@ package it.irideos.metrics.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.irideos.metrics.models.User;
+import it.irideos.metrics.models.UserModel;
 import it.irideos.metrics.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
@@ -14,7 +14,7 @@ public class UserService {
   private UserRepository userRepository;
 
   @Transactional
-  public User createUser(User user) {
+  public UserModel createUser(UserModel user) {
     return userRepository.save(user);
   }
 }

@@ -10,7 +10,8 @@ import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
-import it.irideos.metrics.models.User;
+import it.irideos.metrics.models.OauthModel;
+import it.irideos.metrics.models.UserModel;
 import it.irideos.metrics.service.UserService;
 import jakarta.annotation.PostConstruct;
 
@@ -18,7 +19,7 @@ import jakarta.annotation.PostConstruct;
 public class OcloudAuth {
 
     @Autowired
-    public OauthConfig authConfig;
+    public OauthModel authConfig;
     @Autowired
     public UserService userService;
 
@@ -63,15 +64,15 @@ public class OcloudAuth {
         // System.out.println("DELETE EXISTING TOKEN" + deleteToken);
 
         // User Example Usage
-        User user = new User(1L, "Marco", "Colaiuda");
-        System.out.println("User Before: " + user.getFirstName());
+        UserModel user = new UserModel(1L, "Marco", true);
+        System.out.println("User Before: " + user.getName());
 
         // Persist User object to database through UserService
         user = userService.createUser(user);
-        System.out.println("User After: " + user.getFirstName());
+        System.out.println("User After: " + user.getName());
     }
 
-    public String GetToken() {
+    public String getToken() {
         final String tokenToString;
         tokenToString = token.toString();
         System.out.println("TOKEN RILASCIATO: " + tokenToString);
