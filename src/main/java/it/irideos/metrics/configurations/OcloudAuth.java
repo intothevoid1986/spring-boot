@@ -74,7 +74,7 @@ public class OcloudAuth {
     public String GetToken() {
         final String tokenToString;
         tokenToString = token.toString();
-        // System.out.println("TOKEN RILASCIATO: " + tokenToString);
+        System.out.println("TOKEN RILASCIATO: " + tokenToString);
         return tokenToString;
     }
 }
