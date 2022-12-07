@@ -1,16 +1,21 @@
 package it.irideos.metrics.controller;
 
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import jakarta.annotation.PostConstruct;
 
+@RestController
 public class getGnocchiApi {
 
     @Autowired
@@ -22,20 +27,35 @@ public class getGnocchiApi {
     @Autowired
     private GnocchiConfig gnocchiConfig;
 
-    public HttpHeaders getRequestHeaderBearer(String uri) {
+    @PostConstruct
+    private void getGnocchiInstance() {
+        try {
+            String body = "";
+            String gnocchiUrl = gnocchiConfig.getEndpoint();
+            String url = gnocchiUrl + "/resource/instance";
+            System.out.println("Gnocchi Url Compose: " + url);
+            HttpHeaders headers = createHttpHeaders();
+            HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+            System.out.printf("RESPONSE: ", response);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
 
-        final String AUTHORIZATION_HEADER = "Authorization";
+    private HttpHeaders createHttpHeaders() {
         String tokenString = auhtToken.GetToken();
+        tokenString = extracted(tokenString);
+        final String AUTHORIZATION_HEADER = "Authorization";
         HttpHeaders headers = new HttpHeaders();
-        String gnocchiUrl = gnocchiConfig.getGnocchiEndpoint();
-        String url = gnocchiUrl + "/resource/instance";
-        // String url =
-        // "https://gnocchi.it-mil1.entercloudsuite.com/v1/resource/instance";
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(AUTHORIZATION_HEADER, "Bearer " + tokenString);
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-        System.out.printf("RESPONSE: ", response);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add(AUTHORIZATION_HEADER, "X-Auth-Token" + tokenString);
+        System.out.println("Gnocchi-Get Token: " + tokenString);
         return headers;
+    }
+
+    private String extracted(String tokenString) {
+        return tokenString.substring(17, 200);
     }
 }

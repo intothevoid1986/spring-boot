@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 // @EntityScan("it.irideos.metrics.models*")
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties("spring.opestack.auth")
+@ConfigurationProperties("spring.openstack.auth")
 public class OauthConfig {
 
     public String endpoint;

@@ -8,13 +8,13 @@ import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.identity.v3.Token;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
 
 import it.irideos.metrics.models.User;
 import it.irideos.metrics.service.UserService;
 import jakarta.annotation.PostConstruct;
 
-@Service
+@Configuration
 public class OcloudAuth {
 
     @Autowired
@@ -42,7 +42,6 @@ public class OcloudAuth {
                 .authenticate();
         os.useRegion(region);
         this.token = os.getToken();
-        System.out.println("TOKEN RILASCIATO: " + token);
 
         // List Server
         List<? extends Server> Servers = os.compute().servers().list();
@@ -75,7 +74,7 @@ public class OcloudAuth {
     public String GetToken() {
         final String tokenToString;
         tokenToString = token.toString();
-        System.out.println("TOKEN RILASCIATO: " + tokenToString);
+        // System.out.println("TOKEN RILASCIATO: " + tokenToString);
         return tokenToString;
     }
 }

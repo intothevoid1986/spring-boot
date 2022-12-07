@@ -1,5 +1,5 @@
 spring:
-  opestack:
+  openstack:
     auth:
       endpoint: https://api.it-mil1.entercloudsuite.com/v3
       project_Id: 9430056e47ae41b4a09e63bf7c2dd444
