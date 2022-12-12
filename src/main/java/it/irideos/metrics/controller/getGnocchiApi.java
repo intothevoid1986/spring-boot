@@ -46,13 +46,12 @@ public class getGnocchiApi {
     private HttpHeaders createHttpHeaders() {
         String tokenString = auhtToken.getToken();
         tokenString = extracted(tokenString);
-        // final String AUTHORIZATION_HEADER = "Authorization";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(tokenString);
         headers.add("X-Auth-Token", tokenString);
-        System.out.println("Gnocchi-Get Token: " + tokenString);
+        System.out.println("Gnocchi- GetToken: " + tokenString);
         return headers;
     }
 

@@ -20,9 +20,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ocloud_cost
-    username: docker
-    password: SA
+    url: jdbc:postgresql://195.78.196.121/ocloud_cost
+    username: ocloud_cost
+    password: staging123!
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
