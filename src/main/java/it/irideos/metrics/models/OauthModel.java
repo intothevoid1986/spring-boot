@@ -3,13 +3,15 @@ package it.irideos.metrics.models;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import lombok.Data;
 
 @Data
 @Configuration
 @EnableConfigurationProperties
-@ConfigurationProperties("spring.openstack.auth")
+@PropertySource("classpath:openstack.properties")
+@ConfigurationProperties("auth")
 public class OauthModel {
 
     public String endpoint;

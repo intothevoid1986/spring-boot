@@ -1,10 +1,7 @@
 package it.irideos.metrics.configurations;
 
-import java.util.List;
-
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.Identifier;
-import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.identity.v3.Token;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +42,7 @@ public class OcloudAuth {
         this.token = os.getToken();
 
         // List Server
-        List<? extends Server> Servers = os.compute().servers().list();
-        System.out.println("LISTA SERVER ACTIVE: " + Servers);
+        // List<? extends Server> Servers = os.compute().servers().list();
 
         // List Roles for User
         // List<? extends Role> domainUserRolesList =
@@ -65,17 +61,15 @@ public class OcloudAuth {
 
         // User Example Usage
         UserModel user = new UserModel(1L, "Marco", true);
-        System.out.println("User Before: " + user.getName());
 
         // Persist User object to database through UserService
         user = userService.createUser(user);
-        System.out.println("User After: " + user.getName());
     }
 
     public String getToken() {
         final String tokenToString;
         tokenToString = token.toString();
-        System.out.println("TOKEN RILASCIATO: " + tokenToString);
+        // System.out.println("TOKEN RILASCIATO: " + tokenToString);
         return tokenToString;
     }
 }

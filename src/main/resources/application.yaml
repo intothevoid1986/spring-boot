@@ -1,15 +1,4 @@
 spring:
-  openstack:
-    auth:
-      endpoint: https://api.it-mil1.entercloudsuite.com/v3
-      project_Id: 9430056e47ae41b4a09e63bf7c2dd444
-      username: marco.colaiuda@irideos.it
-      password: Hondafour750!!
-      tenantName: marco.colaiuda@irideos.it
-      domainName: Default
-      region: it-mil1
-  gnocchi:
-    endpoint: https://gnocchi.it-mil1.entercloudsuite.com/v1
   batch:
     jdbc:
       initialize-schema: ALWAYS
@@ -20,9 +9,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://195.78.196.121/ocloud_cost
-    username: ocloud_cost
-    password: staging123!
+    url: jdbc:postgresql://localhost:5432/ocloud_cost
+    username: docker
+    password: SA
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
