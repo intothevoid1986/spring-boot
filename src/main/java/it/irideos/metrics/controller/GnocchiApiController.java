@@ -52,7 +52,7 @@ public class GnocchiApiController {
             ObjectMapper objectMapper = new ObjectMapper();
             
             // Mappo la risposta in oggeto Token
-            Token token = objectMapper.readValue(response.getBody(), Token.class)
+            Token token = objectMapper.readValue(response.getBody(), Token.class);
             
             // Mappo token in TokenModel
             TokenModel model = GnocchiApiMapper.INSTANCE
