@@ -2,7 +2,6 @@ package it.irideos.metrics.controller;
 
 import java.util.Collections;
 
-import org.openstack4j.model.identity.v3.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,8 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
-import it.irideos.metrics.mapper.GnocchiApiMapper;
-import it.irideos.metrics.models.TokenModel;
+import it.irideos.metrics.models.ResourcesModel;
 import jakarta.annotation.PostConstruct;
 
 @RestController
@@ -38,28 +36,22 @@ public class GnocchiApiController {
             String body = "";
             String gnocchiUrl = gnocchiConfig.getEndpoint();
             String url = gnocchiUrl + "/resource/instance";
-            System.out.println("Gnocchi Url Compose: " + url);
+            // System.out.println("Gnocchi Url Compose: " + url);
             HttpHeaders headers = createHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            System.out.printf("RESPONSE: ", response.getBody());
+            // System.out.printf("RESPONSE: ", response.getBody());
 
-            // FIXME: Questo si incazza perché si aspetta un tipo Token, mentre response
-            // è una stringa. Guarda qui per la soluzione:
-            // https://stackoverflow.com/questions/68744766/how-to-map-httpresponse-in-a-object-java
-            
             //Creo istanza di ObjectMapper (Jakson)
             ObjectMapper objectMapper = new ObjectMapper();
             
             // Mappo la risposta in oggeto Token
-            Token token = objectMapper.readValue(response.getBody(), Token.class);
+            ResourcesModel[] tokens = objectMapper.readValue(response.getBody(), ResourcesModel[].class);
             
-            // Mappo token in TokenModel
-            TokenModel model = GnocchiApiMapper.INSTANCE
-                    .tokenToTokenModel(token);
-            
-                    // Stampo
-                    System.out.println(model.toString());
+            // Stampo
+            for (ResourcesModel token : tokens) {
+                System.out.println(token.toString());
+            }
 
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -74,7 +66,7 @@ public class GnocchiApiController {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(tokenString);
         headers.add("X-Auth-Token", tokenString);
-        System.out.println("Gnocchi- GetToken: " + tokenString);
+        // System.out.println("Gnocchi- GetToken: " + tokenString);
         return headers;
     }
 
