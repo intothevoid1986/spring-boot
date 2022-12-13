@@ -13,10 +13,11 @@ import org.springframework.web.client.RestTemplate;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import it.irideos.metrics.mapper.GnocchiApiMapper;
 import jakarta.annotation.PostConstruct;
 
 @RestController
-public class getGnocchiApi {
+public class GnocchiApiController {
 
     @Autowired
     RestTemplate restTemplate;
@@ -37,7 +38,13 @@ public class getGnocchiApi {
             HttpHeaders headers = createHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            System.out.printf("RESPONSE: ", response);
+            System.out.printf("RESPONSE: ", response.getBody());
+
+            // FIXME: Questo si incazza perché si aspetta un tipo Token, mentre response
+            // è una stringa. Guarda qui per la soluzione:
+            // https://auth0.com/blog/how-to-automatically-map-jpa-entities-into-dtos-in-spring-boot-using-mapstruct/
+            GnocchiApiMapper.INSTANCE.tokenToTokenModel();
+
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
