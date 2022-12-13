@@ -22,6 +22,7 @@ public class MetricsModel extends BaseModel {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metrics_sequence")
   private Long id;
 
-  @JsonProperty(value = "vcpus") // -> this annotation map JSON field name with Java class field name
+  @JsonProperty(value = "vcpus_id") // -> this annotation map JSON field name with Java class field name
   private String vcpus;
+
 }
