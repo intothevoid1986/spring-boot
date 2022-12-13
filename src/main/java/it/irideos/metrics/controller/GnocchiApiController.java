@@ -15,14 +15,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
-import it.irideos.metrics.models.ResourcesModel;
+import it.irideos.metrics.models.VmResourcesModel;
+import it.irideos.metrics.service.VmResourceService;
 import jakarta.annotation.PostConstruct;
 
 @RestController
 public class GnocchiApiController {
 
+    private VmResourcesModel[] vmResources;
+
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Autowired
     private OcloudAuth auhtToken;
@@ -30,32 +33,35 @@ public class GnocchiApiController {
     @Autowired
     private GnocchiConfig gnocchiConfig;
 
+    @Autowired
+    private VmResourceService VmResourceService;
+
     @PostConstruct
     private void getGnocchiInstance() {
+        String body = "";
+        String gnocchiUrl = gnocchiConfig.getEndpoint();
+        String url = gnocchiUrl + "/resource/instance";
+        // System.out.println("Gnocchi Url Compose: " + url);
+        HttpHeaders headers = createHttpHeaders();
+        HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+        // System.out.printf("RESPONSE: ", response.getBody());
+
+        // Creo istanza di ObjectMapper (Jakson)
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String body = "";
-            String gnocchiUrl = gnocchiConfig.getEndpoint();
-            String url = gnocchiUrl + "/resource/instance";
-            // System.out.println("Gnocchi Url Compose: " + url);
-            HttpHeaders headers = createHttpHeaders();
-            HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            // System.out.printf("RESPONSE: ", response.getBody());
-
-            //Creo istanza di ObjectMapper (Jakson)
-            ObjectMapper objectMapper = new ObjectMapper();
-            
             // Mappo la risposta in oggeto Token
-            ResourcesModel[] tokens = objectMapper.readValue(response.getBody(), ResourcesModel[].class);
-            
-            // Stampo
-            for (ResourcesModel token : tokens) {
-                System.out.println(token.toString());
-            }
-
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+            vmResources = objectMapper.readValue(response.getBody(), VmResourcesModel[].class);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
+        // Stampo
+        for (VmResourcesModel vmResource : vmResources) {
+            VmResourceService.createVmResource(vmResource);
+        }
+
+        VmResourcesModel tmp = VmResourceService.listVmResourceById(Long.valueOf("3"));
+        System.out.println("TMP:\n" + tmp);
     }
 
     private HttpHeaders createHttpHeaders() {
