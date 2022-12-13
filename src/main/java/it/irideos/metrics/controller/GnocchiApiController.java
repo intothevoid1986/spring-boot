@@ -2,6 +2,7 @@ package it.irideos.metrics.controller;
 
 import java.util.Collections;
 
+import org.openstack4j.model.identity.v3.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.mapper.GnocchiApiMapper;
+import it.irideos.metrics.models.TokenModel;
 import jakarta.annotation.PostConstruct;
 
 @RestController
@@ -42,8 +46,20 @@ public class GnocchiApiController {
 
             // FIXME: Questo si incazza perché si aspetta un tipo Token, mentre response
             // è una stringa. Guarda qui per la soluzione:
-            // https://auth0.com/blog/how-to-automatically-map-jpa-entities-into-dtos-in-spring-boot-using-mapstruct/
-            GnocchiApiMapper.INSTANCE.tokenToTokenModel();
+            // https://stackoverflow.com/questions/68744766/how-to-map-httpresponse-in-a-object-java
+            
+            //Creo istanza di ObjectMapper (Jakson)
+            ObjectMapper objectMapper = new ObjectMapper();
+            
+            // Mappo la risposta in oggeto Token
+            Token token = objectMapper.readValue(response.getBody(), Token.class)
+            
+            // Mappo token in TokenModel
+            TokenModel model = GnocchiApiMapper.INSTANCE
+                    .tokenToTokenModel(token);
+            
+                    // Stampo
+                    System.out.println(model.toString());
 
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());

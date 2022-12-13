@@ -4,7 +4,7 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.factory.Mappers;
-import org.springframework.http.ResponseEntity;
+import org.openstack4j.model.identity.v3.Token;
 
 import it.irideos.metrics.models.TokenModel;
 
@@ -13,6 +13,6 @@ public interface GnocchiApiMapper {
 
   GnocchiApiMapper INSTANCE = Mappers.getMapper(GnocchiApiMapper.class);
 
-  TokenModel tokenToTokenModel(ResponseEntity<String> token);
+  TokenModel tokenToTokenModel(Token token);
 
 }
