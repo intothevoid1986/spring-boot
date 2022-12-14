@@ -35,6 +35,9 @@ public class VmResourcesModel extends BaseModel {
   @JsonProperty(value = "flavor_name")
   private String flavorName;
 
+  @JsonProperty(value = "type")
+  private String type;
+
   @JsonProperty(value = "metrics")
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "metrics_id")
