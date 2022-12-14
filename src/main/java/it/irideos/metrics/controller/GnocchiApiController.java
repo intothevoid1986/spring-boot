@@ -1,6 +1,8 @@
 package it.irideos.metrics.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.VmResourcesModel;
 import it.irideos.metrics.service.VmResourceService;
 import jakarta.annotation.PostConstruct;
@@ -36,13 +39,14 @@ public class GnocchiApiController {
     @Autowired
     private VmResourceService VmResourceService;
 
+    Map<String, String> vcpus = new HashMap<>();
+
     @PostConstruct
     private void getGnocchiInstance() {
-        String body = "";
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
         HttpHeaders headers = createHttpHeaders();
-        HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
         // Creo istanza
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -52,12 +56,35 @@ public class GnocchiApiController {
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
+
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
+            MetricsModel p = vmResource.getMetrics();
+            vcpus.put("vcpu", p.getVcpus());
+            GetResourceForVcpu();
         }
 
         VmResourcesModel tmp = VmResourceService.listVmResourceById(Long.valueOf("3"));
         System.out.println("TMP:\n" + tmp);
+    }
+
+    private void GetResourceForVcpu() {
+        String gnocchiUrl = gnocchiConfig.getEndpoint();
+        String url = gnocchiUrl +
+                "/metric/{vcpu}/measures?aggregation=count&start=2022-11-30T14:00&stop=2022-11-30T15:00";
+        HttpHeaders headers = createHttpHeaders();
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        // Creo istanza
+        // ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Mappo la risposta
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
+                    requestEntity, String.class,
+                    vcpus);
+            System.out.println("VCPU RESOURCE RES:" + response.getBody());
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
     }
 
     private HttpHeaders createHttpHeaders() {
