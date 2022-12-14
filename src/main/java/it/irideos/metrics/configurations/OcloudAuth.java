@@ -41,24 +41,6 @@ public class OcloudAuth {
         os.useRegion(region);
         this.token = os.getToken();
 
-        // List Server
-        // List<? extends Server> Servers = os.compute().servers().list();
-
-        // List Roles for User
-        // List<? extends Role> domainUserRolesList =
-        // os.identity().users().listDomainUserRoles(username, domainName);
-        // System.out.println("LISTA ROULI PER UTENTE: " + domainUserRolesList);
-
-        // List Project for User
-        // List<? extends Role> projectUserRolesList =
-        // os.identity().users().listProjectUserRoles(username, projectId);
-        // System.out.println("LISTA PROJECT PER UTENTE: " + projectUserRolesList);
-
-        // Deleting Token
-        // String tokenToString = token.toString();
-        // ActionResponse deleteToken = os.identity().tokens().delete(tokenToString);
-        // System.out.println("DELETE EXISTING TOKEN" + deleteToken);
-
         // User Example Usage
         UserModel user = new UserModel(1L, "Marco", true);
 
@@ -69,7 +51,6 @@ public class OcloudAuth {
     public String getToken() {
         final String tokenToString;
         tokenToString = token.toString();
-        // System.out.println("TOKEN RILASCIATO: " + tokenToString);
         return tokenToString;
     }
 }

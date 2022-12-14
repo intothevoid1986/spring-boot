@@ -41,19 +41,17 @@ public class GnocchiApiController {
         String body = "";
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
-        // System.out.println("Gnocchi Url Compose: " + url);
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-        // Creo istanza di ObjectMapper (Jakson)
+        // Creo istanza
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // Mappo la risposta in oggeto
+            // Mappo la risposta
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             vmResources = objectMapper.readValue(response.getBody(), VmResourcesModel[].class);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
-
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
         }
