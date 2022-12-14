@@ -63,17 +63,12 @@ public class GnocchiApiController {
     }
 
     private HttpHeaders createHttpHeaders() {
-        String tokenString = auhtToken.getToken();
-        tokenString = extracted(tokenString);
+        String tokenString = auhtToken.token.getId();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(tokenString);
         headers.add("X-Auth-Token", tokenString);
         return headers;
-    }
-
-    private String extracted(String tokenString) {
-        return tokenString.substring(17, 200);
     }
 }
