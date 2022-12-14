@@ -44,18 +44,16 @@ public class GnocchiApiController {
         // System.out.println("Gnocchi Url Compose: " + url);
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-        // System.out.printf("RESPONSE: ", response.getBody());
-
         // Creo istanza di ObjectMapper (Jakson)
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // Mappo la risposta in oggeto Token
+            // Mappo la risposta in oggeto
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             vmResources = objectMapper.readValue(response.getBody(), VmResourcesModel[].class);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
-        // Stampo
+
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
         }
@@ -72,7 +70,6 @@ public class GnocchiApiController {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(tokenString);
         headers.add("X-Auth-Token", tokenString);
-        // System.out.println("Gnocchi- GetToken: " + tokenString);
         return headers;
     }
 
