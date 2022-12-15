@@ -15,7 +15,7 @@ public class VmResourceService {
 
     @Transactional
     public VmResourcesModel createVmResource(VmResourcesModel vmResource) {
-        return vmResourceRepository.save(vmResource);
+        return vmResourceRepository.saveAndFlush(vmResource);
     }
 
     @Transactional

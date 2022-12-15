@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ public class MetricsModel extends BaseModel {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metrics_sequence")
   private Long id;
 
+  @JoinColumn(name = "metrics")
   @JsonProperty(value = "vcpus") // -> this annotation map JSON field name with Java class field name
   private String vcpus;
 

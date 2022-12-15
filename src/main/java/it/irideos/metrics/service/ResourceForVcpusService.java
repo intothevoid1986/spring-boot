@@ -15,7 +15,7 @@ public class ResourceForVcpusService {
 
     @Transactional
     public ResourcesForVcpusModel createResourceForVcpus(ResourcesForVcpusModel vcpusResource) {
-        return resourceForVcpusRepository.save(vcpusResource);
+        return resourceForVcpusRepository.saveAndFlush(vcpusResource);
     }
 
 }

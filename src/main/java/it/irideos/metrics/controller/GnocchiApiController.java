@@ -4,9 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
 
@@ -27,11 +25,14 @@ import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourcesForVcpusModel;
 import it.irideos.metrics.models.VmResourcesModel;
+import it.irideos.metrics.service.MetricsService;
 import it.irideos.metrics.service.ResourceForVcpusService;
 import it.irideos.metrics.service.VmResourceService;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
+@Log4j2
 public class GnocchiApiController {
 
     private VmResourcesModel[] vmResources;
@@ -52,7 +53,10 @@ public class GnocchiApiController {
     @Autowired
     private ResourceForVcpusService resourceForVcpusService;
 
-    Map<String, String> vcpus = new HashMap<>();
+    @Autowired
+    private MetricsService metricsService;
+
+    private List<String> vcpus = new ArrayList<>();
 
     @PostConstruct
     private void getGnocchiInstance() {
@@ -67,43 +71,41 @@ public class GnocchiApiController {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             vmResources = objectMapper.readValue(response.getBody(), VmResourcesModel[].class);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            log.warn("Exception", e.getMessage());
         }
 
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
             MetricsModel p = vmResource.getMetrics();
-            vcpus.put("vcpu", p.getVcpus());
-            getResourceForVcpu();
+            vcpus.add(p.getVcpus());
         }
+        vcpus.forEach(vcpu -> {
+            getResourceForVcpu(vcpu);
+        });
 
-        VmResourcesModel tmp = VmResourceService.listVmResourceById(Long.valueOf("3"));
-        System.out.println("TMP:\n" + tmp);
+        log.info(resourceForVcpusService);
+
     }
 
-    private void getResourceForVcpu() {
+    private void getResourceForVcpu(String vcpu) {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl +
                 "/metric/{vcpu}/measures?aggregation=count&start=2022-11-30T14:00&stop=2022-12-01T14:00";
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        // Creo istanza
-        // ObjectMapper objectMapper = new ObjectMapper();
         try {
+            MetricsModel metrics = metricsService.listVmByVcpus(vcpu);
             // Mappo la risposta
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
                     requestEntity, String.class,
-                    vcpus);
-            // vcpResourcesModels = objectMapper.readValue(response.getBody(),
-            // ResourcesForVcpusModel[].class);
-            // System.out.println("VCPU RESOURCE RES:" + vcpResourcesModels);
+                    vcpu);
             vcpResourcesModels = parse(response.getBody());
             for (ResourcesForVcpusModel vcpResourcesModel : vcpResourcesModels) {
-                System.out.println("\n\n" + vcpResourcesModel.toString());
+                vcpResourcesModel.setMetrics(metrics);
                 resourceForVcpusService.createResourceForVcpus(vcpResourcesModel);
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            log.warn("Exception", e.getMessage());
         }
     }
 
