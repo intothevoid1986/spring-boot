@@ -1,6 +1,6 @@
 package it.irideos.metrics.models;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResoucesForVcpusModel extends BaseModel {
+public class ResourcesForVcpusModel extends BaseModel {
 
     @Id
     @SequenceGenerator(name = "vcpu_sequence", sequenceName = "vcpus_sequence", allocationSize = 1)
@@ -25,15 +25,12 @@ public class ResoucesForVcpusModel extends BaseModel {
     private Long id;
 
     @JsonProperty(value = "timestamp")
-    private Date timestamp;
+    private ZonedDateTime timestamp;
 
-    @JsonProperty(value = "tipo")
-    private String tipo;
-
-    @JsonProperty(value = "flavor_name")
-    private String flavorname;
+    @JsonProperty(value = "granularity")
+    private Double granularity;
 
     @JsonProperty(value = "vcpusnumber")
-    private Integer vcpusnumber;
+    private Double vcpusnumber;
 
 }

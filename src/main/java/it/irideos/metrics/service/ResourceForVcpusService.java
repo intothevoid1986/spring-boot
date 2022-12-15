@@ -3,7 +3,7 @@ package it.irideos.metrics.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.irideos.metrics.models.ResoucesForVcpusModel;
+import it.irideos.metrics.models.ResourcesForVcpusModel;
 import it.irideos.metrics.repository.ResourceForVcpusRepository;
 import jakarta.transaction.Transactional;
 
@@ -14,7 +14,7 @@ public class ResourceForVcpusService {
     ResourceForVcpusRepository resourceForVcpusRepository;
 
     @Transactional
-    public ResoucesForVcpusModel createResourceForVcpus(ResoucesForVcpusModel vcpusResource) {
+    public ResourcesForVcpusModel createResourceForVcpus(ResourcesForVcpusModel vcpusResource) {
         return resourceForVcpusRepository.save(vcpusResource);
     }
 
