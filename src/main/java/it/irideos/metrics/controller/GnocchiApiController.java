@@ -2,6 +2,9 @@ package it.irideos.metrics.controller;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,13 +87,14 @@ public class GnocchiApiController {
         });
 
         log.info(resourceForVcpusService);
-
     }
 
     private void getResourceForVcpu(String vcpu) {
+        String dtFrom = formatterInstantYesterdayToString();
+        String dtTo = formatterInstantNowToString();
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl +
-                "/metric/{vcpu}/measures?aggregation=count&start=2022-11-30T14:00&stop=2022-12-01T14:00";
+                "/metric/{vcpu}/measures?aggregation=count&start=" + dtFrom + "&stop=" + dtTo;
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
         try {
@@ -107,6 +111,29 @@ public class GnocchiApiController {
         } catch (Exception e) {
             log.warn("Exception", e.getMessage());
         }
+    }
+
+    private String formatterInstantYesterdayToString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
+                .withZone(ZoneId.from(ZoneOffset.UTC));
+        Instant now = Instant.now();
+        Instant yesterday = now.minus(1, ChronoUnit.DAYS);
+        String formattedInstantToString = formatter.format(yesterday);
+        String dt = formattedInstantToString.substring(0, 11);
+        String hr = "00:00:00";
+        String yesterdayDtTime = dt + "" + hr;
+        return yesterdayDtTime;
+    }
+
+    private String formatterInstantNowToString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
+                .withZone(ZoneId.from(ZoneOffset.UTC));
+        Instant now = Instant.now();
+        String formattedInstantNowToString = formatter.format(now);
+        String dtNow = formattedInstantNowToString.substring(0, 11);
+        String hr = "00:00:00";
+        String NowDtTime = dtNow + "" + hr;
+        return NowDtTime;
     }
 
     private HttpHeaders createHttpHeaders() {

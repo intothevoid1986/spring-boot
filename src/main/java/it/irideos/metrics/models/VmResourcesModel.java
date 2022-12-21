@@ -35,6 +35,9 @@ public class VmResourcesModel extends BaseModel {
   @JsonProperty(value = "flavor_name")
   private String flavorName;
 
+  @JsonProperty(value = "image_ref")
+  private String imageRef;
+
   @JsonProperty(value = "type")
   private String type;
 

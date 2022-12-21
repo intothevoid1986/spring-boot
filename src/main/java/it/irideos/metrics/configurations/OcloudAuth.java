@@ -42,7 +42,7 @@ public class OcloudAuth {
         this.token = os.getToken();
 
         // User Example Usage
-        UserModel user = new UserModel(1L, "Marco", true);
+        UserModel user = new UserModel(1L, username, true);
 
         // Persist User object to database through UserService
         user = userService.createUser(user);
