@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import it.irideos.metrics.models.OauthModel;
 import it.irideos.metrics.models.TenantModel;
-import it.irideos.metrics.service.UserService;
+import it.irideos.metrics.service.TenantService;
 import jakarta.annotation.PostConstruct;
 
 @Configuration
@@ -18,7 +18,7 @@ public class OcloudAuth {
     @Autowired
     public OauthModel authConfig;
     @Autowired
-    public UserService userService;
+    public TenantService tenantService;
 
     public Token token = null;
 
@@ -42,10 +42,10 @@ public class OcloudAuth {
         this.token = os.getToken();
 
         // User Example Usage
-        TenantModel user = new TenantModel(1L, username, true);
+        TenantModel tenant = new TenantModel(1L, username, true);
 
         // Persist User object to database through UserService
-        user = userService.createUser(user);
+        tenant = tenantService.createUser(tenant);
     }
 
     public String getToken() {
