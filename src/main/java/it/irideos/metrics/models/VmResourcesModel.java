@@ -15,7 +15,7 @@ import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Entity(name = "vm_resources")
+@Entity(name = "resources")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)

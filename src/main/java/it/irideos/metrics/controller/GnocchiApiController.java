@@ -60,6 +60,7 @@ public class GnocchiApiController {
     private MetricsService metricsService;
 
     private List<String> vcpus = new ArrayList<>();
+    private List<String> image_refs = new ArrayList<>();
 
     @PostConstruct
     private void getGnocchiInstance() {
@@ -80,6 +81,8 @@ public class GnocchiApiController {
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
             MetricsModel p = vmResource.getMetrics();
+            image_refs.add(vmResource.getImageRef());
+            System.out.println("IMAGE REFS: " + image_refs);
             vcpus.add(p.getVcpus());
         }
         vcpus.forEach(vcpu -> {

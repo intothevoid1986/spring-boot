@@ -17,7 +17,7 @@ import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Entity(name = "resource_vcpus")
+@Entity(name = "measure")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
