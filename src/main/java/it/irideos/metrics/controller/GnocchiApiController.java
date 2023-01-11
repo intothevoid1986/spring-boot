@@ -25,9 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourcesForVcpusModel;
 import it.irideos.metrics.models.VmResourcesModel;
+import it.irideos.metrics.repository.ImageRepository;
 import it.irideos.metrics.service.MetricsService;
 import it.irideos.metrics.service.ResourceForVcpusService;
 import it.irideos.metrics.service.VmResourceService;
@@ -38,8 +40,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class GnocchiApiController {
 
+    private List<ImageModel> imageModels;
     private VmResourcesModel[] vmResources;
     private List<ResourcesForVcpusModel> vcpResourcesModels;
+    private List<String> vcpus = new ArrayList<>();
 
     @Autowired
     private RestTemplate restTemplate;
@@ -59,13 +63,16 @@ public class GnocchiApiController {
     @Autowired
     private MetricsService metricsService;
 
-    private List<String> vcpus = new ArrayList<>();
-    private List<String> image_refs = new ArrayList<>();
+    @Autowired
+    private ImageRepository imageRepository;
 
     @PostConstruct
     private void getGnocchiInstance() {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
+        String img = "";
+        String img_ref = "";
+        String srv = "";
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
         // Creo istanza
@@ -81,8 +88,18 @@ public class GnocchiApiController {
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
             MetricsModel p = vmResource.getMetrics();
-            image_refs.add(vmResource.getImageRef());
-            System.out.println("IMAGE REFS: " + image_refs);
+            if (vmResource.getImageRef() != null) {
+                img_ref = vmResource.getImageRef();
+                List<ImageModel> i = imageRepository.findByImageModels(img_ref);
+                img = i.toString();
+                imageModels = parseImage(img);
+                for (ImageModel imageModel : imageModels) {
+                    srv = imageModel.getService();
+                    System.out.println("SERVICE: " + srv);
+                }
+
+            }
+            ;
             vcpus.add(p.getVcpus());
         }
         vcpus.forEach(vcpu -> {
@@ -174,6 +191,41 @@ public class GnocchiApiController {
             r.setTimestamp(time.atZone(ZoneId.systemDefault()));
             r.setGranularity(Double.valueOf(s[1]));
             r.setVcpusnumber(Double.valueOf(s[2]));
+            res.add(r);
+        }
+
+        return res;
+    }
+
+    private List<ImageModel> parseImage(String value) throws NotFoundException {
+        List<ImageModel> res = new ArrayList<>();
+
+        if (value.equals("[]")) {
+            throw new NotFoundException();
+        } else {
+            ImageModel r = new ImageModel();
+            String[] values = StringUtils.split(value, ", ");
+            value = values[0];
+
+            // Strip away square brackets
+            String firstCleanValue = StringUtils.delete(values[0], "[");
+            String firstClean = StringUtils.delete(firstCleanValue, "ImageModel");
+
+            // // Strip away square brackets
+            String firstResultString = StringUtils.delete(firstClean, "(");
+            value = values[1];
+            String secondCleanValue = StringUtils.delete(values[1], "]");
+            String secondClean = StringUtils.delete(secondCleanValue, ")");
+            String resultString = firstResultString + ", " + secondClean;
+
+            // Convert comma separated String to String[]
+            String[] s = StringUtils.commaDelimitedListToStringArray(resultString);
+            String srv = String.valueOf(s[1].substring(9, s[1].length()));
+            String iref = String.valueOf(s[2].substring(11, s[2].length()));
+
+            // Map to Object
+            r.setService(srv);
+            r.setImage_ref(iref);
             res.add(r);
         }
 
