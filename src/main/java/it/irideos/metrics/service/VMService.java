@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.MetricsRepository;
-import it.irideos.metrics.repository.VmResourceRepository;
+import it.irideos.metrics.repository.VMRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class VmResourceService {
+public class VMService {
 
     @Autowired
-    private VmResourceRepository vmResourceRepository;
+    private VMRepository vmResourceRepository;
 
     @Autowired
     private MetricsRepository metricsRepository;

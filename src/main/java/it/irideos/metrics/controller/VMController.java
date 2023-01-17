@@ -3,14 +3,11 @@ package it.irideos.metrics.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.NotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,11 +18,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
-import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.service.ResourceService;
-import it.irideos.metrics.service.VmResourceService;
+import it.irideos.metrics.service.VMService;
 import it.irideos.metrics.utils.HttpUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
@@ -50,7 +46,7 @@ public class VMController {
     private GnocchiConfig gnocchiConfig;
 
     @Autowired
-    private VmResourceService VmResourceService;
+    private VMService VmResourceService;
 
     @Autowired
     private ResourceService resourceService;
