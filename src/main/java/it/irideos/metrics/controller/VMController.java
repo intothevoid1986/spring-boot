@@ -1,6 +1,5 @@
 package it.irideos.metrics.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.MetricsModel;
+import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.service.ResourceService;
 import it.irideos.metrics.service.VMService;
@@ -30,11 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class VMController {
 
-    // private List<ImageModel> imageModels;
-    // private List<ClusterModel> clustModels;
-    // private List<ResourcesModel> vcpResourcesModels;
     private VMModel[] vmResources;
-    private List<String> vcpus = new ArrayList<>();
 
     @Autowired
     private RestTemplate restTemplate;
@@ -51,26 +47,12 @@ public class VMController {
     @Autowired
     private ResourceService resourceService;
 
-    // @Autowired
-    // private MetricsService metricsService;
-
-    // @Autowired
-    // private ImageRepository imageRepository;
-
-    // @Autowired
-    // private ClusterRepository clusterRepository;
-
     @PostConstruct
     private void getVMInstances() throws JsonMappingException, JsonProcessingException {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
-        // String img = "";
-        // String img_ref = "";
-        // String srv = "";
-        // String clusterName = "";
         HttpHeaders headers = HttpUtils.createHttpHeaders(authToken);
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        // Creo istanza
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         try {
@@ -78,19 +60,24 @@ public class VMController {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             vmResources = objectMapper.readValue(response.getBody(), VMModel[].class);
         } catch (Exception e) {
-            log.warn("Exception", e.getMessage());
+            e.printStackTrace();
         }
 
         for (VMModel vmResource : vmResources) {
-            VmResourceService.createVmResource(vmResource);
-            MetricsModel p = vmResource.getResource().getMetrics();
+            ResourceModel p = vmResource.getResource();
 
-            vcpus.add(p.getVcpus());
+            List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
+            // TODO: debuggare i loop per capire come vengono "appese" le metriche
+            // all'oggetto padre.
+            metrics.forEach(metric -> {
+                vmResource.getResource().setMetrics(metric);
+            });
         }
-        vcpus.forEach(vcpu -> {
-            resourceService.getResourceForVcpu(vcpu);
-        });
 
         log.info(resourceService);
+
+        for (VMModel vmResource : vmResources) {
+            VmResourceService.createVmResource(vmResource);
+        }
     }
 }

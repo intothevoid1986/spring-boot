@@ -6,7 +6,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-public class Utils {
+public class MetricsUtils {
   public static String formatterInstantYesterdayToString() {
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
         .withZone(ZoneId.from(ZoneOffset.UTC));

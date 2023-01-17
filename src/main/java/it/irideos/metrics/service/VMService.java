@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import it.irideos.metrics.models.VMModel;
-import it.irideos.metrics.repository.MetricsRepository;
+import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.repository.VMRepository;
 import jakarta.transaction.Transactional;
 
@@ -15,12 +15,12 @@ public class VMService {
     private VMRepository vmResourceRepository;
 
     @Autowired
-    private MetricsRepository metricsRepository;
+    private ResourceRepository resourceRepository;
 
     @Transactional
     public VMModel createVmResource(VMModel vmResource) {
 
-        if (metricsRepository.existsMetricsModelByVcpus(vmResource.getResource().getMetrics().getVcpus())) {
+        if (resourceRepository.existsResourceModelByVcpus(vmResource.getResource().getVcpus())) {
             return vmResource;
         }
         return vmResourceRepository.saveAndFlush(vmResource);

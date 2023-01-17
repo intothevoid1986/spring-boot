@@ -43,8 +43,8 @@ public class VMModel extends BaseModel {
 
   @JsonProperty(value = "metrics")
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "metrics_id")
-  private ResourcesModel resource;
+  @JoinColumn(name = "resource_id")
+  private ResourceModel resource;
 
   @JsonIgnore
   public Long getId() {
