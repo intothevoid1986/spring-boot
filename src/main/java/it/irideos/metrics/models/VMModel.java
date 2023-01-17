@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +19,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VmResourcesModel extends BaseModel {
+public class VMModel extends BaseModel {
 
   @Id
   @SequenceGenerator(name = "vm_sequence", sequenceName = "vm_sequence", allocationSize = 1)
@@ -38,8 +41,10 @@ public class VmResourcesModel extends BaseModel {
   @JsonProperty(value = "type")
   private String type;
 
-  @JsonProperty(value = "resource")
-  private ResourcesForVcpusModel resource;
+  @JsonProperty(value = "metrics")
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "metrics_id")
+  private ResourcesModel resource;
 
   @JsonIgnore
   public Long getId() {

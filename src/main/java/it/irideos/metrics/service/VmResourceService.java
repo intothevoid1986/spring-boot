@@ -3,7 +3,7 @@ package it.irideos.metrics.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.irideos.metrics.models.VmResourcesModel;
+import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.MetricsRepository;
 import it.irideos.metrics.repository.VmResourceRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ public class VmResourceService {
     private MetricsRepository metricsRepository;
 
     @Transactional
-    public VmResourcesModel createVmResource(VmResourcesModel vmResource) {
+    public VMModel createVmResource(VMModel vmResource) {
 
         if (metricsRepository.existsMetricsModelByVcpus(vmResource.getResource().getMetrics().getVcpus())) {
             return vmResource;
@@ -27,7 +27,7 @@ public class VmResourceService {
     }
 
     @Transactional
-    public VmResourcesModel listVmResourceById(Long id) {
+    public VMModel listVmResourceById(Long id) {
         return vmResourceRepository.findById(id).orElseThrow();
     }
 }

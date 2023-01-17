@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
-public class ResourcesForVcpusModel extends BaseModel {
+public class ResourcesModel extends BaseModel {
 
     @Id
     @SequenceGenerator(name = "vcpu_sequence", sequenceName = "vcpus_sequence", allocationSize = 1)
