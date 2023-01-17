@@ -21,6 +21,7 @@ public class VMService {
     public VMModel createVmResource(VMModel vmResource) {
 
         if (resourceRepository.existsResourceModelByVcpus(vmResource.getResource().getVcpus())) {
+            // TODO: gestire il caso di ritorno per evitare exceptions.
             return vmResource;
         }
         return vmResourceRepository.saveAndFlush(vmResource);
