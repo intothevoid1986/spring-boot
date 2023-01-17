@@ -67,11 +67,7 @@ public class VMController {
             ResourceModel p = vmResource.getResource();
 
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
-            // TODO: debuggare i loop per capire come vengono "appese" le metriche
-            // all'oggetto padre.
-            metrics.forEach(metric -> {
-                vmResource.getResource().setMetrics(metric);
-            });
+            vmResource.getResource().setMetrics(metrics);
         }
 
         log.info(resourceService);

@@ -1,5 +1,7 @@
 package it.irideos.metrics.models;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,9 +33,9 @@ public class ResourceModel extends BaseModel {
   @JsonProperty(value = "vcpus") // -> this annotation map JSON field name with Java class field name
   private String vcpus;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "metrics_vcpus")
   @JsonIgnore
-  private MetricsModel metrics;
+  private List<MetricsModel> metrics;
 
 }
