@@ -14,7 +14,7 @@ public class TenantService {
   private TenantRepository tenantRepository;
 
   @Transactional
-  public TenantModel createUser(TenantModel user) {
-    return tenantRepository.save(user);
+  public TenantModel createTenant(TenantModel tenant) {
+    return tenantRepository.save(tenant);
   }
 }

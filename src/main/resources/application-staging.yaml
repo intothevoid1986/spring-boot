@@ -24,7 +24,11 @@ spring:
         type: trace
         dialect: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
+        jdbc:
+          time_zone: UTC
 logging:
   level:
+    it: 
+      irideos: DEBUG
     org:
-      springframework: ERROR
+      springframework: INFO

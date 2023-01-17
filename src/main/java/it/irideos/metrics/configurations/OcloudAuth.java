@@ -45,7 +45,7 @@ public class OcloudAuth {
         TenantModel tenant = new TenantModel(1L, username, true);
 
         // Persist User object to database through UserService
-        tenant = tenantService.createUser(tenant);
+        tenant = tenantService.createTenant(tenant);
     }
 
     public String getToken() {

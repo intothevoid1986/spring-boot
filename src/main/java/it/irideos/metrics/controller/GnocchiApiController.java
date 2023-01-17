@@ -21,14 +21,20 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourcesForVcpusModel;
 import it.irideos.metrics.models.VmResourcesModel;
+import it.irideos.metrics.repository.ClusterRepository;
 import it.irideos.metrics.repository.ImageRepository;
 import it.irideos.metrics.service.MetricsService;
 import it.irideos.metrics.service.ResourceForVcpusService;
@@ -41,6 +47,7 @@ import lombok.extern.log4j.Log4j2;
 public class GnocchiApiController {
 
     private List<ImageModel> imageModels;
+    private List<ClusterModel> clustModels;
     private VmResourcesModel[] vmResources;
     private List<ResourcesForVcpusModel> vcpResourcesModels;
     private List<String> vcpus = new ArrayList<>();
@@ -66,17 +73,22 @@ public class GnocchiApiController {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private ClusterRepository clusterRepository;
+
     @PostConstruct
-    private void getGnocchiInstance() {
+    private void getGnocchiInstance() throws JsonMappingException, JsonProcessingException {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
         String img = "";
         String img_ref = "";
         String srv = "";
+        String clusterName = "";
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
         // Creo istanza
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); 
         try {
             // Mappo la risposta
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
@@ -87,7 +99,7 @@ public class GnocchiApiController {
 
         for (VmResourcesModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
-            MetricsModel p = vmResource.getMetrics();
+            MetricsModel p = vmResource.getResource().getMetrics();
             if (vmResource.getImageRef() != null) {
                 img_ref = vmResource.getImageRef();
                 List<ImageModel> i = imageRepository.findByImageModels(img_ref);
@@ -96,8 +108,13 @@ public class GnocchiApiController {
                 for (ImageModel imageModel : imageModels) {
                     srv = imageModel.getService();
                     System.out.println("SERVICE: " + srv);
+                    ArrayList<ClusterModel> clm = new ArrayList<>();
+                    clm = clusterRepository.findNameByClusterService(srv);
+                    clusterName = clm.toString();
+                    // clustModels = objectMapper.readValue(clusterName, new
+                    // TypeReference<List<ClusterModel>>() {
+                    // });
                 }
-
             }
             ;
             vcpus.add(p.getVcpus());
@@ -118,18 +135,22 @@ public class GnocchiApiController {
         HttpHeaders headers = createHttpHeaders();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             MetricsModel metrics = metricsService.listVmByVcpus(vcpu);
             // Mappo la risposta
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
                     requestEntity, String.class,
                     vcpu);
-            vcpResourcesModels = parse(response.getBody());
+            log.debug("measures response Body: " + response.getBody());
+            vcpResourcesModels = objectMapper.readValue(response.getBody(), new TypeReference<List<ResourcesForVcpusModel>>() { });
+            log.debug("measures list size: " + vcpResourcesModels.size());
             for (ResourcesForVcpusModel vcpResourcesModel : vcpResourcesModels) {
                 vcpResourcesModel.setMetrics(metrics);
-                resourceForVcpusService.createResourceForVcpus(vcpResourcesModel);
+
             }
         } catch (Exception e) {
-            log.warn("Exception", e.getMessage());
+            log.warn("Unexpected Error retrieving or parsing data: ", e);
         }
     }
 
@@ -166,42 +187,12 @@ public class GnocchiApiController {
         return headers;
     }
 
-    private List<ResourcesForVcpusModel> parse(String value) throws NotFoundException {
-        List<ResourcesForVcpusModel> res = new ArrayList<>();
-
-        if (value.equals("[]")) {
-            throw new NotFoundException();
-        }
-
-        while (value.indexOf("], ") != -1) {
-            ResourcesForVcpusModel r = new ResourcesForVcpusModel();
-            String[] values = StringUtils.split(value, "], ");
-            value = values[1];
-            // Strip away square brackets
-            String cleanValue = StringUtils.delete(values[0], "[");
-            cleanValue = StringUtils.delete(cleanValue, "]");
-            // Convert comma separated String to String[]
-            String[] s = StringUtils.commaDelimitedListToStringArray(cleanValue);
-
-            // Strip away " from date field
-            String date = StringUtils.delete(s[0], String.valueOf('"'));
-
-            // Map to Object
-            Instant time = Instant.parse(date);
-            r.setTimestamp(time.atZone(ZoneId.systemDefault()));
-            r.setGranularity(Double.valueOf(s[1]));
-            r.setVcpusnumber(Double.valueOf(s[2]));
-            res.add(r);
-        }
-
-        return res;
-    }
-
     private List<ImageModel> parseImage(String value) throws NotFoundException {
         List<ImageModel> res = new ArrayList<>();
 
         if (value.equals("[]")) {
-            throw new NotFoundException();
+            // throw new NotFoundException();
+            log.info(value);
         } else {
             ImageModel r = new ImageModel();
             String[] values = StringUtils.split(value, ", ");

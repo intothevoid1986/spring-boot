@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.repository.MetricsRepository;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 @Service
@@ -32,4 +33,8 @@ public class MetricsService {
     return found;
   }
 
+  @Transactional
+  public List<MetricsModel> listMetrics(List<String> vcpus) {
+    return metricsRepository.findAll();
+  }
 }
