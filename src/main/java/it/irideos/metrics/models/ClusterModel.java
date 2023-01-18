@@ -24,9 +24,9 @@ public class ClusterModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cluster_name")
-    public String service;
-
     @Column(name = "service")
-    private String image_ref;
+    private String service;
+
+    @Column(name = "cluster_name")
+    public String cluster_name;
 }

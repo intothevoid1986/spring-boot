@@ -20,6 +20,7 @@ import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.VMModel;
+import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
 import it.irideos.metrics.service.VMService;
 import it.irideos.metrics.utils.HttpUtils;
@@ -47,6 +48,9 @@ public class VMController {
     @Autowired
     private ResourceService resourceService;
 
+    @Autowired
+    private ImageService imageService;
+
     @PostConstruct
     private void getVMInstances() throws JsonMappingException, JsonProcessingException {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
@@ -65,7 +69,7 @@ public class VMController {
 
         for (VMModel vmResource : vmResources) {
             ResourceModel p = vmResource.getResource();
-
+            imageService.getImageRef(vmResource);
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
         }

@@ -5,15 +5,26 @@ import java.util.List;
 
 import javax.ws.rs.NotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import it.irideos.metrics.models.ImageModel;
+import it.irideos.metrics.models.VMModel;
+import it.irideos.metrics.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class ImageService {
+
+  private List<ImageModel> imageModels;
+
+  @Autowired
+  private ImageRepository imageRepository;
 
   public List<ImageModel> parseImage(String value) throws NotFoundException {
     List<ImageModel> res = new ArrayList<>();
@@ -51,22 +62,17 @@ public class ImageService {
     return res;
   }
 
-  // private void toBeCompleted() {
-  // if (vmResource.getImageRef() != null) {
-  // img_ref = vmResource.getImageRef();
-  // List<ImageModel> i = imageRepository.findByImageModels(img_ref);
-  // img = i.toString();
-  // imageModels = parseImage(img);
-  // for (ImageModel imageModel : imageModels) {
-  // srv = imageModel.getService();
-  // System.out.println("SERVICE: " + srv);
-  // ArrayList<ClusterModel> clm = new ArrayList<>();
-  // clm = clusterRepository.findNameByClusterService(srv);
-  // clusterName = clm.toString();
-  // // clustModels = objectMapper.readValue(clusterName, new
-  // // TypeReference<List<ClusterModel>>() {
-  // // });
-  // }
-  // }
-  // }
+  public List<ImageModel> getImageRef(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
+    if (vmResource.getImageRef() != null) {
+      List<ImageModel> image = imageRepository.findByImageModels(vmResource.getImageRef());
+      // Mappo la risposta
+      String img = image.toString();
+      imageModels = parseImage(img);
+      for (ImageModel imageModel : imageModels) {
+        System.out.println("SERVICE: " + imageModel.getService());
+
+      }
+    }
+    return imageModels;
+  }
 }

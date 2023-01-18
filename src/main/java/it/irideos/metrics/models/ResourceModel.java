@@ -33,7 +33,7 @@ public class ResourceModel extends BaseModel {
   @JsonProperty(value = "vcpus") // -> this annotation map JSON field name with Java class field name
   private String vcpus;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn(name = "metrics_vcpus")
   @JsonIgnore
   private List<MetricsModel> metrics;
