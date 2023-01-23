@@ -72,7 +72,6 @@ public class ImageService {
       log.info(img);
       imageModels = parseImage(img);
       for (ImageModel imageModel : imageModels) {
-        // System.out.println("SERVICE: " + imageModel.getService());
         clusterService.findClusterName(imageModel.getService().toString(), vmResource.getDisplayName());
       }
     }

@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.repository.UsageHourRepository;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 @Service
@@ -23,6 +25,11 @@ public class UsageHourService {
             usageHourModels = usageHourRepository.findVmAndFlavorIdByDisplayName(displayName, timestamp);
         }
         return usageHourModels;
+    }
+
+    @Transactional
+    public UsageHourModel createUsageHourly(UsageHourModel usage) {
+        return usageHourRepository.save(usage);
     }
 
 }

@@ -20,6 +20,7 @@ import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
+import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.service.ImageService;
@@ -86,25 +87,26 @@ public class VMController {
             for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
                 String displayName = (String) objNameAndTimestamp[0];
                 Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
-                List<Object[]> countVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
+                List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
                         timestamp);
-                for (Object[] objCountVmForFlavorId : countVmForFalvorId) {
-                    Long vm = (Long) objCountVmForFlavorId[0];
+                for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
+                    Long totResource = (Long) objCountVmForFlavorId[0];
                     String flavorId = (String) objCountVmForFlavorId[1];
-                    System.out.println("COUNT VM E FLAVOR: " + vm + ", " + flavorId);
                     List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorId);
-                    for (Object[] hourlyRate : costForFlavorName) {
-                        Double hourlyR = (Double) hourlyRate[0];
-                        Double cost = vm * hourlyR;
-                        System.out.println("COSTO ORARIO: " + cost);
+                    for (Object[] price : costForFlavorName) {
+                        Double hourlyRate = (Double) price[0];
+                        Double costH = totResource * hourlyRate;
+                        UsageHourModel usageHour = new UsageHourModel(1L, displayName, costH,
+                                totResource, timestamp);
+                        usageHour = usageHourService.createUsageHourly(usageHour);
                     }
-
                 }
             }
-
         }
 
         log.info(resourceService);
+        log.info(resourceRepository);
+        log.info(usageHourService);
 
         for (VMModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);

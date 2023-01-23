@@ -11,12 +11,12 @@ import it.irideos.metrics.models.ResourceModel;
 public interface ResourceRepository extends JpaRepository<ResourceModel, Long> {
   boolean existsResourceModelByVcpus(String vcpu);
 
-  @Query(value = "select r.display_name, me.timestamp from resources r\r\n" + //
+  @Query(value = "SELECT r.display_name, me.timestamp FROM resources r\r\n" + //
       "join metrics mt on r.resource_id = mt.id\r\n" + //
       "join measure me on me.metrics_vcpus = mt.id\r\n" + //
       "WHERE mt.vcpus = :vcpus", nativeQuery = true)
   List<Object[]> findDisplayNameAndTimestampByVcpus(@Param("vcpus") String vcpu);
 
-  @Query(value = "SELECT hourly_rate FROM public.price WHERE flavor_name = :flavor_name", nativeQuery = true)
+  @Query(value = "SELECT p.hourly_rate FROM price p WHERE p.flavor_name = :flavor_name", nativeQuery = true)
   List<Object[]> findPriceByFlavorName(@Param("flavor_name") String flavor_name);
 }

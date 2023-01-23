@@ -33,7 +33,7 @@ public class OcloudAuth {
 
         Identifier domainIdentifier = Identifier.byName(domainName);
 
-        // Identity V3 Authentication Example - change params to fit your needs!!
+        // Identity V3 Authentication
         OSClient.OSClientV3 os = OSFactory.builderV3()
                 .endpoint(endpoint)
                 .credentials(username, password, domainIdentifier)
@@ -41,10 +41,9 @@ public class OcloudAuth {
         os.useRegion(region);
         this.token = os.getToken();
 
-        // User Example Usage
         TenantModel tenant = new TenantModel(1L, username, true);
 
-        // Persist User object to database through UserService
+        // Persist Tenant object to database through TenantService
         tenant = tenantService.createTenant(tenant);
     }
 

@@ -26,9 +26,8 @@ public class ClusterService {
 
         if (service != null) {
             clusterName = clusterRepository.findClusterNameByService(service);
-            // System.out.println("LIST CLUSTER NAME: " + clusterName);
             List<ClusterModel> result = clusterName.stream()
-                    .filter(a -> Objects.equals(a.cluster_name, "kube-test-2"))
+                    .filter(a -> Objects.equals(a.cluster_name, "Kube-Test-2"))
                     .collect(Collectors.toList());
             System.out.println("FILTERED CLUSTER NAME: " + result);
             log.info(clusterName.toString());
