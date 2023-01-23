@@ -37,6 +37,6 @@ public class MetricsModel extends BaseModel {
     private Double granularity;
 
     @JsonProperty(index = 2)
-    private Double vcpusnumber;
+    private int vcpusnumber;
 
 }

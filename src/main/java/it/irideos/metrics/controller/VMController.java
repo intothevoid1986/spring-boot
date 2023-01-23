@@ -1,5 +1,6 @@
 package it.irideos.metrics.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,10 @@ import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.VMModel;
+import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
+import it.irideos.metrics.service.UsageHourService;
 import it.irideos.metrics.service.VMService;
 import it.irideos.metrics.utils.HttpUtils;
 import jakarta.annotation.PostConstruct;
@@ -49,7 +52,13 @@ public class VMController {
     private ResourceService resourceService;
 
     @Autowired
+    private ResourceRepository resourceRepository;
+
+    @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private UsageHourService usageHourService;
 
     @PostConstruct
     private void getVMInstances() throws JsonMappingException, JsonProcessingException {
@@ -72,6 +81,27 @@ public class VMController {
             imageService.getImageRef(vmResource);
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
+            List<Object[]> displayNameAndTimestamp = resourceRepository
+                    .findDisplayNameAndTimestampByVcpus(p.getVcpus());
+            for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
+                String displayName = (String) objNameAndTimestamp[0];
+                Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
+                List<Object[]> countVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
+                        timestamp);
+                for (Object[] objCountVmForFlavorId : countVmForFalvorId) {
+                    Long vm = (Long) objCountVmForFlavorId[0];
+                    String flavorId = (String) objCountVmForFlavorId[1];
+                    System.out.println("COUNT VM E FLAVOR: " + vm + ", " + flavorId);
+                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorId);
+                    for (Object[] hourlyRate : costForFlavorName) {
+                        Double hourlyR = (Double) hourlyRate[0];
+                        Double cost = vm * hourlyR;
+                        System.out.println("COSTO ORARIO: " + cost);
+                    }
+
+                }
+            }
+
         }
 
         log.info(resourceService);

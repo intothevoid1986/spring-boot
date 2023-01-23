@@ -26,6 +26,9 @@ public class ImageService {
   @Autowired
   private ImageRepository imageRepository;
 
+  @Autowired
+  private ClusterService clusterService;
+
   public List<ImageModel> parseImage(String value) throws NotFoundException {
     List<ImageModel> res = new ArrayList<>();
 
@@ -64,13 +67,13 @@ public class ImageService {
 
   public List<ImageModel> getImageRef(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
     if (vmResource.getImageRef() != null) {
-      List<ImageModel> image = imageRepository.findByImageModels(vmResource.getImageRef());
-      // Mappo la risposta
-      String img = image.toString();
+      List<ImageModel> imageRef = imageRepository.findByImageModels(vmResource.getImageRef());
+      String img = imageRef.toString();
+      log.info(img);
       imageModels = parseImage(img);
       for (ImageModel imageModel : imageModels) {
-        System.out.println("SERVICE: " + imageModel.getService());
-
+        // System.out.println("SERVICE: " + imageModel.getService());
+        clusterService.findClusterName(imageModel.getService().toString(), vmResource.getDisplayName());
       }
     }
     return imageModels;

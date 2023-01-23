@@ -1,6 +1,7 @@
 package it.irideos.metrics.models;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -16,21 +17,27 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "cluster")
+@Table(name = "usage_hour")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NamedQuery(name = "ClusterModel.findAll", query = "SELECT c FROM ClusterModel c")
-public class ClusterModel implements Serializable {
+@NamedQuery(name = "UsageHourModel.findAll", query = "SELECT u FROM UsageHourModel u")
+public class UsageHourModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
-    private Long id;
-
-    @Column(name = "service")
-    private String service;
+    private Long Id;
 
     @Column(name = "cluster_name")
-    public String cluster_name;
+    private String cluster_name;
+
+    @Column(name = "cost")
+    private Long cost;
+
+    @Column(name = "resource_total")
+    private int resource_total;
+
+    @Column(name = "time_slot")
+    private ZonedDateTime time_slot;
 }
