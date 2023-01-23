@@ -82,26 +82,6 @@ public class VMController {
             imageService.getImageRef(vmResource);
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
-            List<Object[]> displayNameAndTimestamp = resourceRepository
-                    .findDisplayNameAndTimestampByVcpus(p.getVcpus());
-            for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
-                String displayName = (String) objNameAndTimestamp[0];
-                Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
-                List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
-                        timestamp);
-                for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
-                    Long totResource = (Long) objCountVmForFlavorId[0];
-                    String flavorId = (String) objCountVmForFlavorId[1];
-                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorId);
-                    for (Object[] price : costForFlavorName) {
-                        Double hourlyRate = (Double) price[0];
-                        Double costH = totResource * hourlyRate;
-                        UsageHourModel usageHour = new UsageHourModel(1L, displayName, costH,
-                                totResource, timestamp);
-                        usageHour = usageHourService.createUsageHourly(usageHour);
-                    }
-                }
-            }
         }
 
         log.info(resourceService);
@@ -110,6 +90,28 @@ public class VMController {
 
         for (VMModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
+            
+            List<Object[]> displayNameAndTimestamp = resourceRepository
+                    .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
+            for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
+                String displayName = (String) objNameAndTimestamp[0];
+                Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
+                List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
+                        timestamp);
+                for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
+                    Long totResource = (Long) objCountVmForFlavorId[0];
+                    String flavorId = (String) objCountVmForFlavorId[1];
+                    Long resourceId = (Long) objCountVmForFlavorId[2];
+                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorId);
+                    for (Object[] price : costForFlavorName) {
+                        Double hourlyRate = (Double) price[0];
+                        Double costH = totResource * hourlyRate;
+                        UsageHourModel usageHour = new UsageHourModel(1L, displayName, costH,
+                                totResource, timestamp, resourceId);
+                        usageHour = usageHourService.createUsageHourly(usageHour);
+                    }
+                }
+            }
         }
     }
 }
