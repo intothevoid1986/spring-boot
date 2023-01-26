@@ -11,5 +11,5 @@ import it.irideos.metrics.models.ImageModel;
 public interface ImageRepository extends JpaRepository<ImageModel, Long> {
 
     @Query(value = "SELECT i.id, i.image_ref, i.service FROM image i WHERE i.image_ref = :image_ref", nativeQuery = true)
-    List<ImageModel> findByImageModels(@Param("image_ref") String img_ref);
+    List<ImageModel> findImageRefByImageModels(@Param("image_ref") String img_ref);
 }

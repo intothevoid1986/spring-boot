@@ -19,4 +19,13 @@ public interface UsageHourRepository extends JpaRepository<UsageHourModel, Long>
                         "group by r.flavor_name, r.resource_id", nativeQuery = true)
     List<Object[]> findVmAndFlavorIdByDisplayName(@Param("display_name") String displayName,
             @Param("timestamp") Timestamp timestamp);
+
+    @Query(value = "SELECT SUM(me.vcpusnumber) FROM resources rs\r\n" + //
+                    "join metrics mt on rs.resource_id = mt.id\r\n" + //
+                    "join measure me on me.metrics_vcpus = mt.id\r\n" + //
+                    "join image im on im.image_ref = rs.image_ref\r\n" + //
+                    "WHERE rs.display_name = :display_name and me.timestamp = :timestamp\r\n", nativeQuery = true)
+    List<Object[]> findTotResourceForHourByTime(@Param("display_name") String displayName,
+                    @Param("timestamp") Timestamp timestamp);
+
 }

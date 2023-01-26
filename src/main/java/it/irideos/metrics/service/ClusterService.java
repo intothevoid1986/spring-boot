@@ -2,13 +2,10 @@ package it.irideos.metrics.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.repository.ClusterRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,20 +13,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ClusterService {
 
-    // private List<ClusterModel> clusterModels;
+    public ArrayList<String> clusterN = new ArrayList<String>();
 
     @Autowired
     private ClusterRepository clusterRepository;
 
-    public List<ClusterModel> findClusterName(String service, String displayName) {
-        List<ClusterModel> clusterName = new ArrayList<ClusterModel>();
+    public List<Object[]> findClusterName(String service, String displayName) {
+        List<Object[]> clusterName = new ArrayList<Object[]>();
 
-        if (service != null) {
+        if (service != null && displayName != null) {
             clusterName = clusterRepository.findClusterNameByService(service);
-            List<ClusterModel> result = clusterName.stream()
-                    .filter(a -> Objects.equals(a.cluster_name, "Kube-Test-2"))
-                    .collect(Collectors.toList());
-            System.out.println("FILTERED CLUSTER NAME: " + result);
+            for (Object[] clsName : clusterName) {
+                String name = "";
+                name = (String) clsName[0];
+                String dName = "";
+                dName = displayName.substring(0, 4);
+                String clName = "";
+                clName = name.substring(0, 4);
+                if (dName.compareToIgnoreCase(clName) == 0) {
+                    clusterN.add(name);
+                }
+            }
             log.info(clusterName.toString());
         }
         return clusterName;

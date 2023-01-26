@@ -23,6 +23,7 @@ import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.ResourceRepository;
+import it.irideos.metrics.service.ClusterService;
 import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
 import it.irideos.metrics.service.UsageHourService;
@@ -36,6 +37,8 @@ import lombok.extern.log4j.Log4j2;
 public class VMController {
 
     private VMModel[] vmResources;
+    private Long resourceForHour;
+    private String clusterName;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -61,6 +64,9 @@ public class VMController {
     @Autowired
     private UsageHourService usageHourService;
 
+    @Autowired
+    private ClusterService clusterService;
+
     @PostConstruct
     private void getVMInstances() throws JsonMappingException, JsonProcessingException {
         String gnocchiUrl = gnocchiConfig.getEndpoint();
@@ -79,7 +85,6 @@ public class VMController {
 
         for (VMModel vmResource : vmResources) {
             ResourceModel p = vmResource.getResource();
-            imageService.getImageRef(vmResource);
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
         }
@@ -90,24 +95,39 @@ public class VMController {
 
         for (VMModel vmResource : vmResources) {
             VmResourceService.createVmResource(vmResource);
-            
+            imageService.getImageRef(vmResource);
             List<Object[]> displayNameAndTimestamp = resourceRepository
                     .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
             for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
                 String displayName = (String) objNameAndTimestamp[0];
                 Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
+
+                for (String clustName : clusterService.clusterN) {
+                    if (displayName.contains(clustName)) {
+                        clusterName = "";
+                        clusterName = clustName;
+                        break;
+                    }
+                }
+
+                List<Object[]> totResourceForHour = usageHourService.findTotResourceForHour(displayName, timestamp);
+                for (Object[] totalRes : totResourceForHour) {
+                    resourceForHour = (Long) totalRes[0];
+                }
+
                 List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
                         timestamp);
                 for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
-                    Long totResource = (Long) objCountVmForFlavorId[0];
-                    String flavorId = (String) objCountVmForFlavorId[1];
+                    String flavorName = (String) objCountVmForFlavorId[1];
                     Long resourceId = (Long) objCountVmForFlavorId[2];
-                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorId);
+
+                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
                     for (Object[] price : costForFlavorName) {
                         Double hourlyRate = (Double) price[0];
-                        Double costH = totResource * hourlyRate;
-                        UsageHourModel usageHour = new UsageHourModel(1L, displayName, costH,
-                                totResource, timestamp, resourceId);
+                        Double costH = resourceForHour * hourlyRate;
+
+                        UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
+                                resourceForHour, timestamp, resourceId);
                         usageHour = usageHourService.createUsageHourly(usageHour);
                     }
                 }

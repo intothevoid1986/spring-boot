@@ -61,18 +61,17 @@ public class ImageService {
       r.setImage_ref(iref);
       res.add(r);
     }
-
     return res;
   }
 
   public List<ImageModel> getImageRef(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
     if (vmResource.getImageRef() != null) {
-      List<ImageModel> imageRef = imageRepository.findByImageModels(vmResource.getImageRef());
+      List<ImageModel> imageRef = imageRepository.findImageRefByImageModels(vmResource.getImageRef());
       String img = imageRef.toString();
       log.info(img);
       imageModels = parseImage(img);
       for (ImageModel imageModel : imageModels) {
-        clusterService.findClusterName(imageModel.getService().toString(), vmResource.getDisplayName());
+        clusterService.findClusterName(imageModel.getService(), vmResource.getDisplayName());
       }
     }
     return imageModels;

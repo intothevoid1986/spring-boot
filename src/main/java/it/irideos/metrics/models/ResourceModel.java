@@ -30,7 +30,7 @@ public class ResourceModel extends BaseModel {
   private Long id;
 
   @JoinColumn(name = "metrics")
-  @JsonProperty(value = "vcpus") // -> this annotation map JSON field name with Java class field name
+  @JsonProperty(value = "vcpus")
   private String vcpus;
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

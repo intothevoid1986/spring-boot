@@ -27,6 +27,14 @@ public class UsageHourService {
         return usageHourModels;
     }
 
+    public List<Object[]> findTotResourceForHour(String displayName, Timestamp timestamp) {
+        List<Object[]> usageHourModels = new ArrayList<Object[]>();
+        if (displayName != null && timestamp != null) {
+            usageHourModels = usageHourRepository.findTotResourceForHourByTime(displayName, timestamp);
+        }
+        return usageHourModels;
+    }
+
     @Transactional
     public UsageHourModel createUsageHourly(UsageHourModel usage) {
         return usageHourRepository.save(usage);
