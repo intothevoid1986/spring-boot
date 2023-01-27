@@ -2,6 +2,7 @@ package it.irideos.metrics.controller;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
+import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.UsageHourModel;
@@ -38,7 +40,7 @@ public class VMController {
 
     private VMModel[] vmResources;
     private Long resourceForHour;
-    private String clusterName;
+    private String clusterName = "";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -94,21 +96,20 @@ public class VMController {
         log.info(usageHourService);
 
         for (VMModel vmResource : vmResources) {
-            VmResourceService.createVmResource(vmResource);
             imageService.getImageRef(vmResource);
+            Map<ClusterModel, String> cluster = clusterService.getClusterMap();
+            cluster.forEach((k, v) -> {
+                if (vmResource.getDisplayName().contains(v)) {
+                    clusterName = v;
+                    vmResource.setCluster(k);
+                }
+            });
+            VmResourceService.createVmResource(vmResource);
             List<Object[]> displayNameAndTimestamp = resourceRepository
                     .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
             for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
                 String displayName = (String) objNameAndTimestamp[0];
                 Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
-
-                for (String clustName : clusterService.clusterN) {
-                    if (displayName.contains(clustName)) {
-                        clusterName = "";
-                        clusterName = clustName;
-                        break;
-                    }
-                }
 
                 List<Object[]> totResourceForHour = usageHourService.findTotResourceForHour(displayName, timestamp);
                 for (Object[] totalRes : totResourceForHour) {

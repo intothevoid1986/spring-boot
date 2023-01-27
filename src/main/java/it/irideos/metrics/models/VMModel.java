@@ -47,6 +47,10 @@ public class VMModel extends BaseModel {
   @JoinColumn(name = "resource_id")
   private ResourceModel resource;
 
+  @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+  @JoinColumn(name = "cluster_id")
+  private ClusterModel cluster;
+
   @JsonIgnore
   public Long getId() {
     return this.id;

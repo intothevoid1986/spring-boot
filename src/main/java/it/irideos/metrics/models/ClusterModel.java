@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,9 +29,14 @@ public class ClusterModel implements Serializable {
     @JsonIgnore
     private Long id;
 
+
     @Column(name = "service")
     private String service;
 
     @Column(name = "cluster_name")
     public String cluster_name;
+
+    @OneToOne(mappedBy = "cluster")
+    private VMModel resource;
+
 }

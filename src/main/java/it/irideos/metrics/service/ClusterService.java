@@ -1,41 +1,40 @@
 package it.irideos.metrics.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.repository.ClusterRepository;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 public class ClusterService {
 
-    public ArrayList<String> clusterN = new ArrayList<String>();
+    private Map<ClusterModel, String> cluster = new HashMap<ClusterModel, String>();
 
     @Autowired
     private ClusterRepository clusterRepository;
 
-    public List<Object[]> findClusterName(String service, String displayName) {
-        List<Object[]> clusterName = new ArrayList<Object[]>();
-
+    public List<ClusterModel> findClusterName(String service, String displayName) {
+        List<ClusterModel> clusterModel = new ArrayList<ClusterModel>();
         if (service != null && displayName != null) {
-            clusterName = clusterRepository.findClusterNameByService(service);
-            for (Object[] clsName : clusterName) {
-                String name = "";
-                name = (String) clsName[0];
-                String dName = "";
-                dName = displayName.substring(0, 4);
-                String clName = "";
-                clName = name.substring(0, 4);
-                if (dName.compareToIgnoreCase(clName) == 0) {
-                    clusterN.add(name);
+            clusterModel = clusterRepository.findClusterNameByService(service);
+            for (ClusterModel clsName : clusterModel) {
+                String clusterN = clsName.getCluster_name();
+                if (displayName.contains(clusterN)) {
+                    cluster.put(clsName, clusterN);
+                    System.out.println("MAP ENTRY: " + cluster);
                 }
             }
-            log.info(clusterName.toString());
         }
-        return clusterName;
+        return clusterModel;
+    }
+
+    public Map<ClusterModel, String> getClusterMap() {
+        return cluster;
     }
 }
