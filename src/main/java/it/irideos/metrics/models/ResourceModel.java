@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonIgnoreProperties(ignoreUnknown = true) // -> this escape all unwanted fields from JSON, otherwise causing exception
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity(name = "metrics")
 public class ResourceModel extends BaseModel {
 

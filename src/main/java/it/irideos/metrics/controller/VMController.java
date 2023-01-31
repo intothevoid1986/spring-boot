@@ -78,7 +78,6 @@ public class VMController {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         try {
-            // Mappo la risposta
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             vmResources = objectMapper.readValue(response.getBody(), VMModel[].class);
         } catch (Exception e) {
@@ -91,10 +90,6 @@ public class VMController {
             vmResource.getResource().setMetrics(metrics);
         }
 
-        log.info(resourceService);
-        log.info(resourceRepository);
-        log.info(usageHourService);
-
         for (VMModel vmResource : vmResources) {
             imageService.getImageRef(vmResource);
             Map<ClusterModel, String> cluster = clusterService.getClusterMap();
@@ -104,6 +99,7 @@ public class VMController {
                     vmResource.setCluster(k);
                 }
             });
+
             VmResourceService.createVmResource(vmResource);
             List<Object[]> displayNameAndTimestamp = resourceRepository
                     .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
@@ -130,6 +126,7 @@ public class VMController {
                         UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
                                 resourceForHour, timestamp, resourceId);
                         usageHour = usageHourService.createUsageHourly(usageHour);
+                        log.info(usageHourService);
                     }
                 }
             }

@@ -15,12 +15,13 @@ import jakarta.annotation.PostConstruct;
 @Configuration
 public class OcloudAuth {
 
+    public Token token = null;
+
     @Autowired
     public OauthModel authConfig;
+
     @Autowired
     public TenantService tenantService;
-
-    public Token token = null;
 
     @PostConstruct
     public void auth() {
@@ -28,7 +29,6 @@ public class OcloudAuth {
         String username = authConfig.getUserName();
         String password = authConfig.getPassword();
         String domainName = authConfig.getDomainName();
-        // String projectId = authConfig.getProjectId();
         String region = authConfig.getRegion();
 
         Identifier domainIdentifier = Identifier.byName(domainName);
@@ -42,8 +42,6 @@ public class OcloudAuth {
         this.token = os.getToken();
 
         TenantModel tenant = new TenantModel(1L, username, true);
-
-        // Persist Tenant object to database through TenantService
         tenant = tenantService.createTenant(tenant);
     }
 

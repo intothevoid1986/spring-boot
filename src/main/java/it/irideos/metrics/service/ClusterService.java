@@ -27,7 +27,6 @@ public class ClusterService {
                 String clusterN = clsName.getCluster_name();
                 if (displayName.contains(clusterN)) {
                     cluster.put(clsName, clusterN);
-                    System.out.println("MAP ENTRY: " + cluster);
                 }
             }
         }

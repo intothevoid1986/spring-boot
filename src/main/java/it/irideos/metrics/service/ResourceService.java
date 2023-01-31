@@ -72,12 +72,9 @@ public class ResourceService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
                     requestEntity, String.class,
                     vcpu);
-            log.debug("measures response Body: " + response.getBody());
-            // Mappo la risposta
             List<MetricsModel> metricsModelList = objectMapper.readValue(response.getBody(),
                     new TypeReference<List<MetricsModel>>() {
                     });
-            log.debug("measures list size: " + metricsModelList.size());
             return metricsModelList;
         } catch (Exception e) {
             log.warn("Unexpected Error retrieving or parsing data: ", e);

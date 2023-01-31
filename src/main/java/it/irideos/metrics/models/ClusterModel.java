@@ -29,7 +29,6 @@ public class ClusterModel implements Serializable {
     @JsonIgnore
     private Long id;
 
-
     @Column(name = "service")
     private String service;
 
