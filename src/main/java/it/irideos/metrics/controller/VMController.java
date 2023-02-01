@@ -88,48 +88,43 @@ public class VMController {
             ResourceModel p = vmResource.getResource();
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
-        }
 
-        for (VMModel vmResource : vmResources) {
             imageService.getImageRef(vmResource);
+
             Map<ClusterModel, String> cluster = clusterService.getClusterMap();
             cluster.forEach((k, v) -> {
                 if (vmResource.getDisplayName().contains(v)) {
                     clusterName = v;
                     vmResource.setCluster(k);
-                }
-            });
+                    VmResourceService.createVmResource(vmResource);
 
-            VmResourceService.createVmResource(vmResource);
-            List<Object[]> displayNameAndTimestamp = resourceRepository
-                    .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
-            for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
-                String displayName = (String) objNameAndTimestamp[0];
-                Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
+                    List<Object[]> displayNameAndTimestamp = resourceRepository
+                            .findDisplayNameAndTimestampByVcpus(vmResource.getResource().getVcpus());
+                    for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
+                        String displayName = (String) objNameAndTimestamp[0];
+                        Timestamp timestamp = (Timestamp) objNameAndTimestamp[1];
 
-                List<Object[]> totResourceForHour = usageHourService.findTotResourceForHour(displayName, timestamp);
-                for (Object[] totalRes : totResourceForHour) {
-                    resourceForHour = (Long) totalRes[0];
-                }
+                        List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
+                                timestamp);
+                        for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
+                            resourceForHour = (Long) objCountVmForFlavorId[0];
+                            String flavorName = (String) objCountVmForFlavorId[1];
+                            Long resourceId = (Long) objCountVmForFlavorId[2];
 
-                List<Object[]> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
-                        timestamp);
-                for (Object[] objCountVmForFlavorId : sumVmForFalvorId) {
-                    String flavorName = (String) objCountVmForFlavorId[1];
-                    Long resourceId = (Long) objCountVmForFlavorId[2];
+                            List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
+                            for (Object[] price : costForFlavorName) {
+                                Double hourlyRate = (Double) price[0];
+                                Double costH = resourceForHour * hourlyRate;
 
-                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
-                    for (Object[] price : costForFlavorName) {
-                        Double hourlyRate = (Double) price[0];
-                        Double costH = resourceForHour * hourlyRate;
-
-                        UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
-                                resourceForHour, timestamp, resourceId);
-                        usageHour = usageHourService.createUsageHourly(usageHour);
-                        log.info(usageHourService);
+                                UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
+                                        resourceForHour, timestamp, resourceId);
+                                usageHour = usageHourService.createUsageHourly(usageHour);
+                                log.info(usageHourService);
+                            }
+                        }
                     }
                 }
-            }
+            });
         }
     }
 }
