@@ -1,7 +1,9 @@
 package it.irideos.metrics.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
 
@@ -12,6 +14,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.ImageRepository;
@@ -20,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ImageService {
-
-  private List<ImageModel> imageModels;
 
   @Autowired
   private ImageRepository imageRepository;
@@ -59,16 +60,24 @@ public class ImageService {
     return res;
   }
 
-  public List<ImageModel> getImageRef(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
+  public List<ImageModel> getImageModel(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
+    List<ImageModel> imageModels = new ArrayList<ImageModel>();
     if (vmResource.getImageRef() != null) {
       List<ImageModel> imageRef = imageRepository.findImageRefByImageModels(vmResource.getImageRef());
       String img = imageRef.toString();
       log.info(img);
       imageModels = parseImage(img);
-      for (ImageModel imageModel : imageModels) {
-        clusterService.findClusterName(imageModel.getService(), vmResource.getDisplayName());
-      }
+
     }
     return imageModels;
+  }
+
+  public Map<ClusterModel, String> getClusterMap(List<ImageModel> images, VMModel vmResource) {
+    Map<ClusterModel, String> clusterModelMap = new HashMap<>();
+    for (ImageModel image : images) {
+      clusterModelMap = clusterService.findClusterName(image.getService(),
+          vmResource.getDisplayName());
+    }
+    return clusterModelMap;
   }
 }

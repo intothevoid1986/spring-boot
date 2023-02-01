@@ -33,7 +33,7 @@ public class ClusterModel implements Serializable {
     private String service;
 
     @Column(name = "cluster_name")
-    public String cluster_name;
+    public String clusterName;
 
     @OneToOne(mappedBy = "cluster")
     private VMModel resource;

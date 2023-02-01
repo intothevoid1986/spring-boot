@@ -24,6 +24,7 @@ import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
+import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.service.ClusterService;
 import it.irideos.metrics.service.ImageService;
@@ -89,9 +90,9 @@ public class VMController {
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             vmResource.getResource().setMetrics(metrics);
 
-            imageService.getImageRef(vmResource);
+            List<ImageModel> images = imageService.getImageModel(vmResource);
 
-            Map<ClusterModel, String> cluster = clusterService.getClusterMap();
+            Map<ClusterModel, String> cluster = imageService.getClusterMap(images, vmResource);
             cluster.forEach((k, v) -> {
                 if (vmResource.getDisplayName().contains(v)) {
                     clusterName = v;
