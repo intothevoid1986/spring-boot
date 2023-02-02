@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
@@ -47,7 +48,7 @@ public class VMModel extends BaseModel {
   @JoinColumn(name = "resource_id")
   private ResourceModel resource;
 
-  @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "cluster_id")
   private ClusterModel cluster;
 

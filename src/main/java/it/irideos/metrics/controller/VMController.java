@@ -20,13 +20,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.irideos.metrics.configurations.GnocchiConfig;
 import it.irideos.metrics.configurations.OcloudAuth;
 import it.irideos.metrics.models.ClusterModel;
+import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
-import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.repository.ResourceRepository;
-import it.irideos.metrics.service.ClusterService;
 import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
 import it.irideos.metrics.service.UsageHourService;
@@ -66,9 +65,6 @@ public class VMController {
 
     @Autowired
     private UsageHourService usageHourService;
-
-    @Autowired
-    private ClusterService clusterService;
 
     @PostConstruct
     private void getVMInstances() throws JsonMappingException, JsonProcessingException {
