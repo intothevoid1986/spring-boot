@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class MetricsUtils {
+  // used for format and return yesterday datetime
   public static String formatterInstantYesterdayToString() {
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
         .withZone(ZoneId.from(ZoneOffset.UTC));
@@ -19,6 +20,7 @@ public class MetricsUtils {
     return yesterdayDtTime;
   }
 
+  // used for format and return instant datetime
   public static String formatterInstantNowToString() {
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
         .withZone(ZoneId.from(ZoneOffset.UTC));

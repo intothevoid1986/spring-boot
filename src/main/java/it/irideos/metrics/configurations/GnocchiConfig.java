@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.client.RestTemplate;
 
+//pojo class for set gnocchi endpoint
+
 @Configuration
 @EnableConfigurationProperties
 @PropertySource("classpath:gnocchi.properties")

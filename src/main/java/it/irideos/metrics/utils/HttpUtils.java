@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import it.irideos.metrics.configurations.OcloudAuth;
 
 public class HttpUtils {
+  // used for call gnocchi API
   public static HttpHeaders createHttpHeaders(OcloudAuth authToken) {
     String tokenString = authToken.token.getId();
     HttpHeaders headers = new HttpHeaders();

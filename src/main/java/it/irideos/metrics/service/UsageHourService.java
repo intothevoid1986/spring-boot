@@ -1,8 +1,11 @@
 package it.irideos.metrics.service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,20 +18,32 @@ import lombok.Data;
 @Service
 @Data
 public class UsageHourService {
+    Long sumVcpu;
+    String flavor;
 
     @Autowired
     private UsageHourRepository usageHourRepository;
 
-    public List<Object[]> findVmAndFlavorByDisplayName(String displayName, Timestamp timestamp) {
-        List<Object[]> usageHourModels = new ArrayList<Object[]>();
+    public Map<Long, String> findVmAndFlavorByDisplayName(String displayName, Timestamp timestamp)
+            throws NotFoundException {
+        Map<Long, String> vcpusMap = new HashMap<Long, String>();
         if (displayName != null && timestamp != null) {
-            usageHourModels = usageHourRepository.findVmAndFlavorIdByDisplayName(displayName, timestamp);
+            List<Object[]> usageHourModels = usageHourRepository.findVmAndFlavorIdByDisplayName(displayName, timestamp);
+            for (Object[] vcpu : usageHourModels) {
+                sumVcpu = null;
+                flavor = "";
+                sumVcpu = (Long) vcpu[0];
+                flavor = (String) vcpu[1];
+                if (sumVcpu != null && flavor != null) {
+                    vcpusMap.put(sumVcpu, flavor);
+                }
+            }
         }
-        return usageHourModels;
+        return vcpusMap;
     }
 
     @Transactional
-    public UsageHourModel createUsageHourly(UsageHourModel usage) {
+    public UsageHourModel createUsageHourly(UsageHourModel usage) throws NotFoundException, RuntimeException {
         return usageHourRepository.save(usage);
     }
 

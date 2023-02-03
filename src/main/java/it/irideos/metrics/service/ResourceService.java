@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -43,6 +45,7 @@ public class ResourceService {
 
     private ResourceModel found = new ResourceModel();
 
+    // verify that resource exist into table
     public ResourceModel listVmByVcpus(String vcpus) throws NotFoundException {
         List<ResourceModel> list = resourceRepository.findAll();
         ResourceModel model = new ResourceModel();
@@ -55,7 +58,9 @@ public class ResourceService {
         return found;
     }
 
-    public List<MetricsModel> getResourceForVcpu(String vcpu) {
+    // call gnocchi api
+    public List<MetricsModel> getResourceForVcpu(String vcpu)
+            throws JsonMappingException, JsonProcessingException, NotFoundException {
         String dtFrom = MetricsUtils.formatterInstantYesterdayToString();
         String dtTo = MetricsUtils.formatterInstantNowToString();
         String gnocchiUrl = gnocchiConfig.getEndpoint();

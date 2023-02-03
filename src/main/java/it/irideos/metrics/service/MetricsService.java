@@ -2,6 +2,8 @@ package it.irideos.metrics.service;
 
 import java.util.List;
 
+import javax.ws.rs.NotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ public class MetricsService {
   private MetricsRepository metricsRepository;
 
   @Transactional
-  public List<MetricsModel> listMetrics(List<String> vcpus) {
+  public List<MetricsModel> listMetrics(List<String> vcpus) throws NotFoundException, RuntimeException {
     return metricsRepository.findAll();
   }
 }

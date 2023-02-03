@@ -1,5 +1,7 @@
 package it.irideos.metrics.service;
 
+import javax.ws.rs.NotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,7 @@ public class VMService {
     private ResourceRepository resourceRepository;
 
     @Transactional
-    public VMModel createVmResource(VMModel vmResource) {
-
+    public VMModel createVmResource(VMModel vmResource) throws NotFoundException, RuntimeException {
         if (resourceRepository.existsResourceModelByVcpus(vmResource.getResource().getVcpus())) {
             return vmResource;
         }
@@ -27,7 +28,7 @@ public class VMService {
     }
 
     @Transactional
-    public VMModel listVmResourceById(Long id) {
+    public VMModel listVmResourceById(Long id) throws NotFoundException, RuntimeException {
         return vmResourceRepository.findById(id).orElseThrow();
     }
 }

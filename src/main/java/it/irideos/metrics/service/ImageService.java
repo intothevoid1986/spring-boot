@@ -60,7 +60,8 @@ public class ImageService {
     return res;
   }
 
-  public List<ImageModel> getImageModel(VMModel vmResource) throws JsonMappingException, JsonProcessingException {
+  public List<ImageModel> getImageModel(VMModel vmResource)
+      throws JsonMappingException, JsonProcessingException, NotFoundException {
     List<ImageModel> imageModels = new ArrayList<ImageModel>();
     if (vmResource.getImageRef() != null) {
       List<ImageModel> imageRef = imageRepository.findImageRefByImageModels(vmResource.getImageRef());
@@ -72,7 +73,8 @@ public class ImageService {
     return imageModels;
   }
 
-  public Map<ClusterModel, String> getClusterMap(List<ImageModel> images, VMModel vmResource) {
+  public Map<ClusterModel, String> getClusterMap(List<ImageModel> images, VMModel vmResource)
+      throws NotFoundException, RuntimeException {
     Map<ClusterModel, String> clusterModelMap = new HashMap<>();
     for (ImageModel image : images) {
       clusterModelMap = clusterService.findClusterName(image.getService(),

@@ -33,7 +33,7 @@ public class OcloudAuth {
 
         Identifier domainIdentifier = Identifier.byName(domainName);
 
-        // Identity V3 Authentication
+        // Identity V3 Authentication on OpenStack
         OSClient.OSClientV3 os = OSFactory.builderV3()
                 .endpoint(endpoint)
                 .credentials(username, password, domainIdentifier)
@@ -41,10 +41,12 @@ public class OcloudAuth {
         os.useRegion(region);
         this.token = os.getToken();
 
+        // persist username that login into tenant table
         TenantModel tenant = new TenantModel(1L, username, true);
         tenant = tenantService.createTenant(tenant);
     }
 
+    // return token from Openstack auth
     public String getToken() {
         final String tokenToString;
         tokenToString = token.toString();
