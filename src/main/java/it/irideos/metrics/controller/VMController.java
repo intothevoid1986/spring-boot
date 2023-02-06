@@ -151,6 +151,7 @@ public class VMController {
                     timestamp = null;
                     flavorName = "";
                     resourceId = null;
+                    costH = 0.0;
                 }
                 displayName = (String) objNameAndTimestamp[0];
                 timestamp = (Timestamp) objNameAndTimestamp[1];
@@ -187,19 +188,17 @@ public class VMController {
                         double cost = 0.0;
                         cost = resourceForHour * hourlyRate;
                         costHourForFlavor.put(flavorName, cost);
-                        costH = 0.0;
-                        costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
-
-                        // persist data into usage_hour table
-                        if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
-                                && resourceId != null) {
-                            UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
-                                    resourceForHour, timestamp, resourceId);
-                            usageHour = usageHourService.createUsageHourly(usageHour);
-                            log.info(usageHourService);
-                        }
                     }
                 });
+                // persist data into usage_hour table
+                if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
+                        && resourceId != null) {
+                    costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
+                    UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
+                            resourceForHour, timestamp, resourceId);
+                    usageHour = usageHourService.createUsageHourly(usageHour);
+                    log.info(usageHourService);
+                }
             }
         }
     }
