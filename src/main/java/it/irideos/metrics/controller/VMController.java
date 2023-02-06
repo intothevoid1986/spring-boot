@@ -161,7 +161,7 @@ public class VMController {
                     displayName = displayName.substring(0, clusterName.length());
                 }
 
-                // find sum vcpu for every display name, flavor id and timestamp
+                // find sum vcpu for every display name and timestamp
                 Map<Long, String> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
                         timestamp);
                 if (sumVmForFalvorId.equals(null)) {
@@ -187,19 +187,19 @@ public class VMController {
                         double cost = 0.0;
                         cost = resourceForHour * hourlyRate;
                         costHourForFlavor.put(flavorName, cost);
+                        costH = 0.0;
+                        costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
+
+                        // persist data into usage_hour table
+                        if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
+                                && resourceId != null) {
+                            UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
+                                    resourceForHour, timestamp, resourceId);
+                            usageHour = usageHourService.createUsageHourly(usageHour);
+                            log.info(usageHourService);
+                        }
                     }
                 });
-                costH = 0.0;
-                costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
-
-                // persist data into usage_hour table
-                if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
-                        && resourceId != null) {
-                    UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
-                            resourceForHour, timestamp, resourceId);
-                    usageHour = usageHourService.createUsageHourly(usageHour);
-                    log.info(usageHourService);
-                }
             }
         }
     }
