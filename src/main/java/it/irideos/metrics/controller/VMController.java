@@ -1,5 +1,7 @@
 package it.irideos.metrics.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -185,7 +187,7 @@ public class VMController {
                     for (Object[] price : costForFlavorName) {
                         hourlyRate = 0.0;
                         hourlyRate = (Double) price[0];
-                        double cost = 0.0;
+                        Double cost = 0.0;
                         cost = resourceForHour * hourlyRate;
                         costHourForFlavor.put(flavorName, cost);
                     }
@@ -194,6 +196,7 @@ public class VMController {
                 if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
                         && resourceId != null) {
                     costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
+                    BigDecimal.valueOf(costH).setScale(3, RoundingMode.HALF_UP);
                     UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
                             resourceForHour, timestamp, resourceId);
                     usageHour = usageHourService.createUsageHourly(usageHour);
