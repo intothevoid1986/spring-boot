@@ -66,7 +66,6 @@ public class ImageService {
     if (vmResource.getImageRef() != null) {
       List<ImageModel> imageRef = imageRepository.findImageRefByImageModels(vmResource.getImageRef());
       String img = imageRef.toString();
-      log.info(img);
       imageModels = parseImage(img);
 
     }

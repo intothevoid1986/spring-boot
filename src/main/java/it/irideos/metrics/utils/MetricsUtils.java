@@ -1,6 +1,8 @@
 package it.irideos.metrics.utils;
 
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +30,36 @@ public class MetricsUtils {
     String formattedInstantNowToString = formatter.format(now);
     String dtNow = formattedInstantNowToString.substring(0, 11);
     String hr = "00:00:00";
-    String NowDtTime = dtNow + "" + hr;
-    return NowDtTime;
+    String nowDtTime = dtNow + "" + hr;
+    return nowDtTime;
+  }
+
+  public static Timestamp formatterInstantYesterdayToTimestamp() {
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
+        .withZone(ZoneId.from(ZoneOffset.UTC));
+    Instant now = Instant.now();
+    Instant yesterday = now.minus(1, ChronoUnit.DAYS);
+    String formattedInstantToString = formatter.format(yesterday);
+    String dt = formattedInstantToString.substring(0, 11);
+    String hr = "00:00:00";
+    String yesterdayDtTime = dt + "" + hr;
+    LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(yesterdayDtTime));
+    Timestamp dtFrom = Timestamp.valueOf(localDateTime);
+
+    return dtFrom;
+  }
+
+  public static Timestamp formatterInstantNowToTimestamp() {
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
+        .withZone(ZoneId.from(ZoneOffset.UTC));
+    Instant now = Instant.now();
+    String formattedInstantNowToString = formatter.format(now);
+    String dtNow = formattedInstantNowToString.substring(0, 11);
+    String hr = "00:00:00";
+    String nowDtTime = dtNow + "" + hr;
+    LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(nowDtTime));
+    Timestamp dtFrom = Timestamp.valueOf(localDateTime);
+
+    return dtFrom;
   }
 }

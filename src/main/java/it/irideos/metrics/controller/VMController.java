@@ -28,14 +28,19 @@ import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.models.ImageModel;
 import it.irideos.metrics.models.MetricsModel;
 import it.irideos.metrics.models.ResourceModel;
+import it.irideos.metrics.models.UsageHourClusterModel;
 import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
+import it.irideos.metrics.repository.ClusterRepository;
 import it.irideos.metrics.repository.ResourceRepository;
+import it.irideos.metrics.repository.UsageHourRepository;
 import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
+import it.irideos.metrics.service.UsageHourClusterService;
 import it.irideos.metrics.service.UsageHourService;
 import it.irideos.metrics.service.VMService;
 import it.irideos.metrics.utils.HttpUtils;
+import it.irideos.metrics.utils.MetricsUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 
@@ -48,11 +53,16 @@ public class VMController {
     private Double hourlyRate;
     private Long resourceForHour;
     private Long resourceId;
+    private Long clusterId;
+    Long totalRes;
     private String vcpu = "";
     private String flavorName = "";
     private String clusterName = "";
     private String displayName = "";
     private Timestamp timestamp;
+    private Timestamp dtFrom;
+    private Timestamp dtTo;
+    Map<String, Long> cluster_id = new HashMap<>();
 
     @Autowired
     private RestTemplate restTemplate;
@@ -78,10 +88,20 @@ public class VMController {
     @Autowired
     private UsageHourService usageHourService;
 
+    @Autowired
+    private UsageHourRepository usageHourRepository;
+
+    @Autowired
+    private ClusterRepository clusterRepository;
+
+    @Autowired
+    private UsageHourClusterService usageHourClusterService;
+
     @PostConstruct
     private void getVMInstances() // call gnocchi api
             throws JsonMappingException, JsonProcessingException, ArrayIndexOutOfBoundsException,
             NotFoundException {
+
         String gnocchiUrl = gnocchiConfig.getEndpoint();
         String url = gnocchiUrl + "/resource/instance";
         HttpHeaders headers = HttpUtils.createHttpHeaders(authToken);
@@ -101,8 +121,7 @@ public class VMController {
         // for every resource
         for (VMModel vmResource : vmResources) {
             ResourceModel p = vmResource.getResource();
-            // call gnocchi api for retrieve metrics by vcpu and date from date to and
-            // persist data into metrics table
+            // call gnocchi api for retrieve metrics by vcpu and persist data into metrics
             List<MetricsModel> metrics = resourceService.getResourceForVcpu(p.getVcpus());
             if (metrics.equals(null)) {
                 throw new RuntimeException("List Metrics - Metrics Not Found");
@@ -125,7 +144,8 @@ public class VMController {
                     clusterName = "";
                     clusterName = v;
                     vmResource.setCluster(k);
-                    // persist data into resource table
+
+                    // persist data into resource and measure table
                     VmResourceService.createVmResource(vmResource);
                 }
             });
@@ -136,7 +156,7 @@ public class VMController {
             throw new RuntimeException("Vcpus List - Vcpus Not Found");
         }
 
-        // for every metrics
+        // for every vcpu
         for (ResourceModel vcpus : list) {
             vcpu = vcpus.getVcpus();
 
@@ -146,6 +166,7 @@ public class VMController {
             if (displayNameAndTimestamp.equals(null)) {
                 throw new RuntimeException("Find - Display Name and Timestamp Not Found");
             }
+
             for (Object[] objNameAndTimestamp : displayNameAndTimestamp) {
                 if (displayName != null || displayName != "" && timestamp != null && flavorName != null
                         || flavorName != "" && resourceId != null) {
@@ -153,56 +174,103 @@ public class VMController {
                     timestamp = null;
                     flavorName = "";
                     resourceId = null;
+                    clusterId = null;
                     costH = 0.0;
                 }
+
                 displayName = (String) objNameAndTimestamp[0];
                 timestamp = (Timestamp) objNameAndTimestamp[1];
                 flavorName = (String) objNameAndTimestamp[2];
                 resourceId = (Long) objNameAndTimestamp[3];
+                clusterId = (Long) objNameAndTimestamp[4];
 
-                if (displayName.contains(clusterName)) {
-                    displayName = displayName.substring(0, clusterName.length());
+                // find clustername and cluster id for every resource
+                List<Object[]> cluster = clusterRepository.findClusterNameById(clusterId);
+
+                for (Object[] clusterNames : cluster) {
+                    clusterName = "";
+                    clusterName = (String) clusterNames[1];
+                    cluster_id.put(clusterName, clusterId);
                 }
 
-                // find sum vcpu for every display name and timestamp
+                if (displayName.contains(clusterName)) {
+                    // displayName = displayName.substring(0, clusterName.length());
+
+                    // find sum vcpu for every display name and timestamp grouped by falvor name
                 Map<Long, String> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
                         timestamp);
                 if (sumVmForFalvorId.equals(null)) {
                     throw new RuntimeException("Find - Sum of Resource For Hour Not Found");
                 }
-                Map<String, Double> costHourForFlavor = new HashMap<>();
-                sumVmForFalvorId.forEach((k, v) -> {
-                    if (flavorName != null) {
-                        flavorName = "";
-                        resourceForHour = null;
-                    }
-                    resourceForHour = k;
-                    flavorName = v;
 
-                    // find hourly price for every flavor name
-                    List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
-                    if (costForFlavorName.equals(null)) {
-                        throw new RuntimeException("Find - Hourly Price Not Found");
+                // map with flavor name and cost hourly (sum vm * hourly cost)
+                    Map<String, Double> costHourForFlavor = new HashMap<>();
+                    Map<String, Long> totResourceforHour = new HashMap<>();
+
+                    sumVmForFalvorId.forEach((k, v) -> {
+                        if (flavorName != null) {
+                            flavorName = "";
+                            resourceForHour = null;
+                        }
+                        flavorName = v;
+
+                        // find hourly price for every flavor name
+                        List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
+                        if (costForFlavorName.equals(null)) {
+                            throw new RuntimeException("Find - Hourly Price Not Found");
+                        }
+                        for (Object[] price : costForFlavorName) {
+                            hourlyRate = 0.0;
+                            hourlyRate = (Double) price[0];
+                            Double cost = 0.0;
+                            cost = k * hourlyRate;
+                            costHourForFlavor.put(flavorName, cost);
+                            totResourceforHour.put(flavorName, k);
+                        }
+                    });
+
+                    if (clusterName != null && timestamp != null && resourceId != null) {
+                        resourceForHour = null;
+                        costH = 0.0;
+                        resourceForHour = totResourceforHour.values().stream().mapToLong(Long::longValue).sum();
+                        costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
+                        BigDecimal.valueOf(costH).setScale(3, RoundingMode.HALF_UP);
+
+                        // persist data into usage_hour table for every kubernetes resource founds
+                        UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
+                                resourceForHour, timestamp, resourceId, clusterId);
+                        usageHour = usageHourService.createUsageHourly(usageHour);
+
+                        log.info(usageHour);
                     }
-                    for (Object[] price : costForFlavorName) {
-                        hourlyRate = 0.0;
-                        hourlyRate = (Double) price[0];
-                        Double cost = 0.0;
-                        cost = resourceForHour * hourlyRate;
-                        costHourForFlavor.put(flavorName, cost);
-                    }
-                });
-                // persist data into usage_hour table
-                if (clusterName != null && costH != null && resourceForHour != null && timestamp != null
-                        && resourceId != null) {
-                    costH = costHourForFlavor.values().stream().mapToDouble(Double::doubleValue).sum();
-                    BigDecimal.valueOf(costH).setScale(3, RoundingMode.HALF_UP);
-                    UsageHourModel usageHour = new UsageHourModel(1L, clusterName, costH,
-                            resourceForHour, timestamp, resourceId);
-                    usageHour = usageHourService.createUsageHourly(usageHour);
-                    log.info(usageHourService);
                 }
             }
         }
+        // aggregate from usage hour table every resource for cluster
+        cluster_id.forEach((k, v) -> {
+            clusterId = null;
+            clusterId = v;
+            totalRes = null;
+            clusterName = "";
+            costH = 0.0;
+            dtFrom = MetricsUtils.formatterInstantYesterdayToTimestamp();
+            dtTo = MetricsUtils.formatterInstantNowToTimestamp();
+            List<Object[]> usage = usageHourRepository.findUsageHourCluster(clusterId, dtFrom, dtTo);
+            if (usageHourRepository.equals(null)) {
+                throw new RuntimeException("Find - Usage Hour for Total Cluster Not Found");
+            }
+
+            // persist data into usage_hour_cluster table and aggregate by cluster every
+            // resource founds in usage_hour
+            for (Object[] usageHourForCluster : usage) {
+                totalRes = (Long) usageHourForCluster[0];
+                costH = (Double) usageHourForCluster[1];
+                timestamp = (Timestamp) usageHourForCluster[2];
+                clusterName = (String) usageHourForCluster[3];
+                UsageHourClusterModel usageHourCluster = new UsageHourClusterModel(1L, clusterName, costH, totalRes,
+                        timestamp);
+                usageHourCluster = usageHourClusterService.createUsageHourCluster(usageHourCluster);
+            }
+        });
     }
 }

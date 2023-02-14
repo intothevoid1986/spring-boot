@@ -37,6 +37,9 @@ public class UsageHourModel extends BaseModel {
     @Column(name = "time_slot")
     private Timestamp time_slot;
 
-    @Column(name = "usage_hour_id")
-    private Long usage_hour_id;
+    @Column(name = "resource_id")
+    private Long resource_id;
+
+    @Column(name = "cluster_id")
+    private Long cluster_id;
 }

@@ -206,11 +206,30 @@ CREATE TABLE IF NOT EXISTS public.usage_hour
     cost double precision,
     resource_total integer,
     time_slot timestamp(6) without time zone,
-    usage_hour_id bigint,
     CONSTRAINT usage_hour_pkey PRIMARY KEY (id)
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.usage_hour
+    OWNER to ocloud_cost;
+
+
+-- Table: public.usage_hour_cluster
+
+-- DROP TABLE IF EXISTS public.usage_hour_cluster;
+
+CREATE TABLE IF NOT EXISTS public.usage_hour_cluster
+(
+    id bigint NOT NULL,
+    cluster_name character varying(255) COLLATE pg_catalog."default",
+    total_resource integer,
+    "timestamp" timestamp(6) without time zone,
+    total_cost double precision,
+    CONSTRAINT usage_hour_cluster_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.usage_hour_cluster
     OWNER to ocloud_cost;
