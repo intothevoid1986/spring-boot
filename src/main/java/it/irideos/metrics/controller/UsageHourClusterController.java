@@ -29,6 +29,10 @@ public class UsageHourClusterController {
         try {
             List<UsageHourClusterModel> clusterDayCost = new ArrayList<UsageHourClusterModel>();
             if (clustName != null) {
+                // Pro-Tip: Anche se sembra inutile sul momento, fai passare sempre le chiamate per lo strato di Service.
+                // In questo caso invochi direttamente il repository ma se ad esempio il tuo DB cambia
+                // potresti ritrovarti a non disporre più di questa query e saresti obbligato a fare refactoring su un Controller,
+                // molto più complesso da testare e debuggare.
                 clusterDayCost = usageHourClusterRepository.findClusterDayCostByCluster(clustName);
             }
             return new ResponseEntity<>(clusterDayCost, HttpStatus.OK);
