@@ -144,19 +144,19 @@ public class VMController {
                     clusterName = "";
                     clusterName = v;
                     vmResource.setCluster(k);
-
                     // persist data into resource and measure table
                     VmResourceService.createVmResource(vmResource);
                 }
             });
         }
-        // retrieve an exists metrics list from metrics table
+
+        // retrieve all exists metrics from metrics table
         List<ResourceModel> list = resourceRepository.findAll();
         if (list.equals(null)) {
             throw new RuntimeException("Vcpus List - Vcpus Not Found");
         }
 
-        // for every vcpu
+        // for every metrics...
         for (ResourceModel vcpus : list) {
             vcpu = vcpus.getVcpus();
 
@@ -194,16 +194,15 @@ public class VMController {
                 }
 
                 if (displayName.contains(clusterName)) {
-                    // displayName = displayName.substring(0, clusterName.length());
 
-                    // find sum vcpu for every display name and timestamp grouped by falvor name
+                // find sum vcpu for every display name and timestamp grouped by falvor name
                 Map<Long, String> sumVmForFalvorId = usageHourService.findVmAndFlavorByDisplayName(displayName,
                         timestamp);
                 if (sumVmForFalvorId.equals(null)) {
                     throw new RuntimeException("Find - Sum of Resource For Hour Not Found");
                 }
 
-                // map with flavor name and cost hourly (sum vm * hourly cost)
+                    // map with flavor name and cost hourly (sum vm * hourly cost)
                     Map<String, Double> costHourForFlavor = new HashMap<>();
                     Map<String, Long> totResourceforHour = new HashMap<>();
 
@@ -260,16 +259,19 @@ public class VMController {
                 throw new RuntimeException("Find - Usage Hour for Total Cluster Not Found");
             }
 
-            // persist data into usage_hour_cluster table and aggregate by cluster every
-            // resource founds in usage_hour
+            // persist data into usage_hour_cluster table aggregate by cluster and with sum
+            // of cost and vcpu
             for (Object[] usageHourForCluster : usage) {
                 totalRes = (Long) usageHourForCluster[0];
                 costH = (Double) usageHourForCluster[1];
                 timestamp = (Timestamp) usageHourForCluster[2];
                 clusterName = (String) usageHourForCluster[3];
+                BigDecimal.valueOf(costH).setScale(3, RoundingMode.HALF_UP);
                 UsageHourClusterModel usageHourCluster = new UsageHourClusterModel(1L, clusterName, costH, totalRes,
                         timestamp);
                 usageHourCluster = usageHourClusterService.createUsageHourCluster(usageHourCluster);
+
+                log.info(usageHourCluster);
             }
         });
     }

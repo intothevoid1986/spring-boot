@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS public.usage_hour_cluster
     cluster_name character varying(255) COLLATE pg_catalog."default",
     total_resource integer,
     "timestamp" timestamp(6) without time zone,
-    total_cost double precision,
+    total_cost numeric(8,3),
     CONSTRAINT usage_hour_cluster_pkey PRIMARY KEY (id)
 )
 

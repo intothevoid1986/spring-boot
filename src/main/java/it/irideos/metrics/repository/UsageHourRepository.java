@@ -20,10 +20,10 @@ public interface UsageHourRepository extends JpaRepository<UsageHourModel, Long>
     List<Object[]> findVmAndFlavorIdByDisplayName(@Param("display_name") String displayName,
             @Param("timestamp") Timestamp timestamp);
 
-    @Query(value = "SELECT SUM(resource_total), SUM(cost), u.time_slot, u.cluster_name\r\n" + //
+    @Query(value = "SELECT SUM(resource_total), SUM(cost), u.time_slot, u.cluster_name, u.cluster_id\r\n" + //
                     "FROM usage_hour u\r\n" + //
                     "WHERE u.cluster_id = :cluster_id AND u.time_slot BETWEEN :dtFrom AND :dtTo\r\n" + //
-                    "Group by u.time_slot, u.cluster_name")
+                    "Group by u.time_slot, u.cluster_name, u.cluster_id")
     List<Object[]> findUsageHourCluster(@Param("cluster_id") Long cluster_Id,
                     @Param("dtFrom") Timestamp dtFrom,
                     @Param("dtTo") Timestamp dtTo);
