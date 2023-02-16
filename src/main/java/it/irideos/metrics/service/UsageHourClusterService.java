@@ -1,5 +1,8 @@
 package it.irideos.metrics.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,13 @@ public class UsageHourClusterService {
 
     public UsageHourClusterModel createUsageHourCluster(UsageHourClusterModel totalUsage) throws NotFoundException {
         return usageHourClusterRepository.save(totalUsage);
+    }
+
+    public List<UsageHourClusterModel> getClusterDayCost(String clusterName) {
+        List<UsageHourClusterModel> clusterDayCostHour = new ArrayList<UsageHourClusterModel>();
+        clusterDayCostHour = usageHourClusterRepository.findClusterDayCostByCluster(clusterName);
+        return clusterDayCostHour;
+
     }
 
 }

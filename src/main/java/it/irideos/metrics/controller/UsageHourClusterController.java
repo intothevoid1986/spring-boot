@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.irideos.metrics.models.UsageHourClusterModel;
-import it.irideos.metrics.repository.UsageHourClusterRepository;
+import it.irideos.metrics.service.UsageHourClusterService;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -21,7 +21,7 @@ import it.irideos.metrics.repository.UsageHourClusterRepository;
 public class UsageHourClusterController {
 
     @Autowired
-    private UsageHourClusterRepository usageHourClusterRepository;
+    private UsageHourClusterService usageHourClusterService;
 
     @GetMapping("/usage_hour_cluster/{cluster_name}")
     public ResponseEntity<List<UsageHourClusterModel>> getClusterCostDay(
@@ -29,11 +29,7 @@ public class UsageHourClusterController {
         try {
             List<UsageHourClusterModel> clusterDayCost = new ArrayList<UsageHourClusterModel>();
             if (clustName != null) {
-                // Pro-Tip: Anche se sembra inutile sul momento, fai passare sempre le chiamate per lo strato di Service.
-                // In questo caso invochi direttamente il repository ma se ad esempio il tuo DB cambia
-                // potresti ritrovarti a non disporre più di questa query e saresti obbligato a fare refactoring su un Controller,
-                // molto più complesso da testare e debuggare.
-                clusterDayCost = usageHourClusterRepository.findClusterDayCostByCluster(clustName);
+                clusterDayCost = usageHourClusterService.getClusterDayCost(clustName);
             }
             return new ResponseEntity<>(clusterDayCost, HttpStatus.OK);
         } catch (Exception e) {
