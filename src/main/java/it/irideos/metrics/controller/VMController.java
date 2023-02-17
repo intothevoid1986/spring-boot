@@ -31,9 +31,9 @@ import it.irideos.metrics.models.ResourceModel;
 import it.irideos.metrics.models.UsageHourClusterModel;
 import it.irideos.metrics.models.UsageHourModel;
 import it.irideos.metrics.models.VMModel;
-import it.irideos.metrics.repository.ClusterRepository;
 import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.repository.UsageHourRepository;
+import it.irideos.metrics.service.ClusterService;
 import it.irideos.metrics.service.ImageService;
 import it.irideos.metrics.service.ResourceService;
 import it.irideos.metrics.service.UsageHourClusterService;
@@ -92,7 +92,7 @@ public class VMController {
     private UsageHourRepository usageHourRepository;
 
     @Autowired
-    private ClusterRepository clusterRepository;
+    private ClusterService clusterService;
 
     @Autowired
     private UsageHourClusterService usageHourClusterService;
@@ -161,8 +161,8 @@ public class VMController {
             vcpu = vcpus.getVcpus();
 
             // find display name and timestamp for every vcpu
-            List<Object[]> displayNameAndTimestamp = resourceRepository
-                    .findDisplayNameAndTimestampByVcpus(vcpu);
+            List<Object[]> displayNameAndTimestamp = resourceService
+                    .getDisplayNameAndTimestamp(vcpu);
             if (displayNameAndTimestamp.equals(null)) {
                 throw new RuntimeException("Find - Display Name and Timestamp Not Found");
             }
@@ -185,7 +185,7 @@ public class VMController {
                 clusterId = (Long) objNameAndTimestamp[4];
 
                 // find clustername and cluster id for every resource
-                List<Object[]> cluster = clusterRepository.findClusterNameById(clusterId);
+                List<Object[]> cluster = clusterService.getClusterNameById(clusterId);
 
                 for (Object[] clusterNames : cluster) {
                     clusterName = "";
@@ -214,7 +214,7 @@ public class VMController {
                         flavorName = v;
 
                         // find hourly price for every flavor name
-                        List<Object[]> costForFlavorName = resourceRepository.findPriceByFlavorName(flavorName);
+                        List<Object[]> costForFlavorName = resourceService.getPriceByFlavorName(flavorName);
                         if (costForFlavorName.equals(null)) {
                             throw new RuntimeException("Find - Hourly Price Not Found");
                         }
@@ -254,7 +254,7 @@ public class VMController {
             costH = 0.0;
             dtFrom = MetricsUtils.formatterInstantYesterdayToTimestamp();
             dtTo = MetricsUtils.formatterInstantNowToTimestamp();
-            List<Object[]> usage = usageHourRepository.findUsageHourCluster(clusterId, dtFrom, dtTo);
+            List<Object[]> usage = usageHourService.getUsageHourCluster(clusterId, dtFrom, dtTo);
             if (usageHourRepository.equals(null)) {
                 throw new RuntimeException("Find - Usage Hour for Total Cluster Not Found");
             }

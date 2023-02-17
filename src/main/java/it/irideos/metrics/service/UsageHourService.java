@@ -47,4 +47,10 @@ public class UsageHourService {
         return usageHourRepository.save(usage);
     }
 
+    public List<Object[]> getUsageHourCluster(Long clusterId, Timestamp dtFrom, Timestamp dtTo) {
+        List<Object[]> usageHourCluster = usageHourRepository.findUsageHourCluster(clusterId, dtFrom, dtTo);
+
+        return usageHourCluster;
+    }
+
 }

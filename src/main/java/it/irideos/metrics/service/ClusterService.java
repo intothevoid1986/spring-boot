@@ -32,4 +32,10 @@ public class ClusterService {
         }
         return cluster;
     }
+
+    public List<Object[]> getClusterNameById(Long clusterId) {
+        List<Object[]> clusterNameById = clusterRepository.findClusterNameById(clusterId);
+
+        return clusterNameById;
+    }
 }

@@ -86,4 +86,18 @@ public class ResourceService {
         }
         return null;
     }
+
+    public List<Object[]> getDisplayNameAndTimestamp(String vcpu) {
+        List<Object[]> displayNameAndTimestampByVcpu = resourceRepository
+                .findDisplayNameAndTimestampByVcpus(vcpu);
+
+        return displayNameAndTimestampByVcpu;
+
+    }
+
+    public List<Object[]> getPriceByFlavorName(String flavor) {
+        List<Object[]> priceByFlavor = resourceRepository.findPriceByFlavorName(flavor);
+
+        return priceByFlavor;
+    }
 }
