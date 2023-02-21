@@ -9,9 +9,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://195.78.196.121/ocloud_cost
-    username: ocloud_cost
-    password: BazingaBanana
+    url: jdbc:postgresql://195.78.196.121/ocloud_cost_dev1
+    username: ocloud_cost_dev1
+    password: dev1123!
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5

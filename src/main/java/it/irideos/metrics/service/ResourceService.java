@@ -27,6 +27,12 @@ import it.irideos.metrics.utils.HttpUtils;
 import it.irideos.metrics.utils.MetricsUtils;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The class provide a service for crud operation in entity resources
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Slf4j
 @Service
 public class ResourceService {

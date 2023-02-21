@@ -7,6 +7,12 @@ import it.irideos.metrics.models.TenantModel;
 import it.irideos.metrics.repository.TenantRepository;
 import jakarta.transaction.Transactional;
 
+/**
+ * The class provide a service for crud operation in entity tenant
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 public class TenantService {
 

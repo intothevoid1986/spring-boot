@@ -7,6 +7,12 @@ import org.springframework.context.annotation.PropertySource;
 
 import lombok.Data;
 
+/**
+ * The class provide a model for map auth requestin OpenStack
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Data
 @Configuration
 @EnableConfigurationProperties

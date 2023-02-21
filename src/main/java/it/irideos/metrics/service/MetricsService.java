@@ -12,6 +12,12 @@ import it.irideos.metrics.repository.MetricsRepository;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 
+/**
+ * The class provide a service for crud operation in entity metrics
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 @Data
 public class MetricsService {

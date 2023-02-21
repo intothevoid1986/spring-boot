@@ -20,6 +20,12 @@ import it.irideos.metrics.models.VMModel;
 import it.irideos.metrics.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * The class provide a service for crud operation in entity image
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 @Slf4j
 public class ImageService {

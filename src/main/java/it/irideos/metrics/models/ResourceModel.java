@@ -18,6 +18,12 @@ import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * The class provide a model for map entity metrics
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)

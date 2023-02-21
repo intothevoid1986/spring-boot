@@ -3,6 +3,12 @@ package it.irideos.metrics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * main class
+ * 
+ * @author MarcoColaiuda
+ */
+
 @SpringBootApplication
 public class MetricsApplication {
 

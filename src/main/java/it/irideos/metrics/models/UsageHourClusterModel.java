@@ -13,6 +13,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * The class provide a model for map entity usage_hour_cluster
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Entity(name = "usage_hour_cluster")
 @Data
 @EqualsAndHashCode(callSuper = false)

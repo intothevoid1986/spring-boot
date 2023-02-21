@@ -8,6 +8,12 @@ import org.springframework.stereotype.Service;
 import it.irideos.metrics.models.UsageHourClusterModel;
 import it.irideos.metrics.repository.UsageHourClusterRepository;
 
+/**
+ * The class provide a service for crud operation in entity usage_hour_cluster
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 public class UsageHourClusterService {
 

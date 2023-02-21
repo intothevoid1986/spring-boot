@@ -17,6 +17,12 @@ import jakarta.persistence.SequenceGenerator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * The class provide a model for map entity resources
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Entity(name = "resources")
 @Data
 @EqualsAndHashCode(callSuper = false)

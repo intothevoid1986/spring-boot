@@ -7,6 +7,12 @@ import org.springframework.http.MediaType;
 
 import it.irideos.metrics.configurations.OcloudAuth;
 
+/**
+ * The class provide a util http method eventually shared in all application
+ * 
+ * @author MarcoColaiuda
+ */
+
 public class HttpUtils {
   // used for call gnocchi API
   public static HttpHeaders createHttpHeaders(OcloudAuth authToken) {

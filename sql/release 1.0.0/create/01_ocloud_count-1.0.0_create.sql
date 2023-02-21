@@ -4,9 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS public.cluster
 (
-    id bigint NOT NULL DEFAULT nextval('cluster_id_seq'::regclass),
+    id bigint NOT NULL,
     cluster_name character varying(255) COLLATE pg_catalog."default",
     service character varying(255) COLLATE pg_catalog."default",
+    budget numeric(8,3),
     CONSTRAINT cluster_pkey PRIMARY KEY (id)
 )
 

@@ -13,6 +13,12 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * The class provide a model for map entity image
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Entity
 @Table(name = "image")
 @Data

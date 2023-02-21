@@ -12,6 +12,12 @@ import org.springframework.stereotype.Service;
 import it.irideos.metrics.models.ClusterModel;
 import it.irideos.metrics.repository.ClusterRepository;
 
+/**
+ * The class provide a service for crud operation in entity cluster
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 public class ClusterService {
 

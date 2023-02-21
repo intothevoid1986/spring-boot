@@ -8,6 +8,12 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * The class provide a util method share in all application
+ * 
+ * @author MarcoColaiuda
+ */
+
 public class MetricsUtils {
   // used for format and return yesterday datetime
   public static String formatterInstantYesterdayToString() {

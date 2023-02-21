@@ -15,6 +15,12 @@ import it.irideos.metrics.repository.UsageHourRepository;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 
+/**
+ * The class provide a service for crud operation in entity usage_hour
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 @Data
 public class UsageHourService {

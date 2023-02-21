@@ -10,6 +10,12 @@ import it.irideos.metrics.repository.ResourceRepository;
 import it.irideos.metrics.repository.VMRepository;
 import jakarta.transaction.Transactional;
 
+/**
+ * The class provide a service for crud operation in entity resources
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Service
 public class VMService {
 

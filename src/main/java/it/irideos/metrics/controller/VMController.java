@@ -44,6 +44,13 @@ import it.irideos.metrics.utils.MetricsUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * The class provides to access methods for doing operations on
+ * Gnocchi metrics.
+ * 
+ * @author MarcoColaiuda
+ */
+
 @RestController
 @Log4j2
 public class VMController {

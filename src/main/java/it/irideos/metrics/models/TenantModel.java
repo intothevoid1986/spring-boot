@@ -11,6 +11,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * The class provide a model for map entity tenant
+ * 
+ * @author MarcoColaiuda
+ */
+
 @Entity(name = "tenant")
 @Data
 @EqualsAndHashCode(callSuper = false)
